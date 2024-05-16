@@ -1,36 +1,96 @@
 <template>
     <div class="shopcard">
       <header>
-        <el-checkbox size="large" />
-        <span>xxx直营店</span>
+        <input type="checkbox" @change="allSelect" :checked="myIsAll"/>
+        <span>{{data[0].store_name}}</span>
       </header>
       <section class="card">
-        <ul v-for="item in 2" :key="item">
+        <ul v-for="item in data" :key="item">
             <li>
-                <el-checkbox size="large" />
+                <input 
+                    type="checkbox" 
+                    :checked="item.isSelect"
+                    @change="myAllSelect(item)"
+                />
             </li>
-            <li>xxx</li>
-            <li>Lorem, ipsum dolor.</li>
-            <li>88.88</li>
-            <li>999</li>
             <li>
-                <el-button type="danger" :icon="Delete" circle />
-                <el-button type="warning" :icon="Star" circle />
+                <img :src="item.book_imgUrl" alt="加载中...">
+                <span>{{ item.book_name }}</span>
             </li>
-      </ul>
+            <li>{{ item.book_name }}</li>
+            <li>{{ item.book_price }}</li>
+            <li>{{ item.book_count }}</li>
+            <li>
+                <el-button type="danger" :icon="Delete" circle @click="delCard(item.book_id)"/>
+            </li>
+        </ul>
       </section>
-     
     </div>
 </template>
 
 <script setup name="shopcard">
-    import {Delete,Star} from '@element-plus/icons-vue'
+    import myAxios from '@/use/myAxios';
+    import {Delete} from '@element-plus/icons-vue'
+    import { ElMessage } from 'element-plus'
+    import {ref,watch} from 'vue'
+
+    const user = JSON.parse(sessionStorage.getItem('user'));
+    const prop = defineProps(['index','data','send','isAll','isClick','show']);
+    let myIsAll = ref(false) ; // 是否选中当前商家全部商品
+
+    /* 选中该商家的全部商品 */
+    const allSelect = () => {
+        myIsAll.value = !myIsAll.value ;
+        prop.send(prop.index,myIsAll.value) ;
+    }
+    /* 判断是否全部选中同一个商家 */
+    const myAllSelect = (item) => {
+        item.isSelect = !item.isSelect ;
+        let tem  =  true ;
+        prop.data.forEach(e => {
+           if(!e.isSelect) tem = false ;
+        })
+        myIsAll.value = tem ;
+    }
+
+    /* 将购物车全部选中 */
+    const isAllWatch = watch(()=>prop.isClick,(newVal) => {
+        if(newVal){
+            myIsAll.value = true;
+            prop.send(prop.index,myIsAll.value);
+        }else{
+            myIsAll.value = false;
+            prop.send(prop.index,myIsAll.value);
+        }
+    })
+    /* 点击移除出购物车 */
+    const delCard = (book_id) => {
+        console.log(book_id);
+        myAxios({
+            method:'POST',
+            url:'/webapi/delShopcar',
+            params:{
+                user_id: user.id,
+                book_id
+            },
+            headers:{
+                'token': user.token
+            }
+        }).then(res => {
+            ElMessage({
+                message:'移除成功',
+                type:'success'
+            });
+            prop.show(); 
+        }).catch(err => {
+           console.log(err);
+        });
+    }
 </script>
 
 <style lang="scss" scoped>
     .shopcard{
         width:95vw;
-        // height: auto;
         margin:2vh auto;
         display: flex;
         flex-direction: column;
@@ -48,6 +108,7 @@
                 color:black;
                 align-items: center;
                 margin-left: 2vw;
+                line-height: 5vh;
             }
         }
         .card{
@@ -68,7 +129,23 @@
                     text-align: center;
                 }
                 li:nth-child(1){width:10%}
-                li:nth-child(2){width:30%}
+                li:nth-child(2){
+                    width:30%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content:center;
+                    img{
+                        width:30%;
+                        height: 90%;
+                        border:1px solid $blueplus;
+                    }
+                    span{
+                        width:40%;
+                        display: block;
+                        color:$blue;
+                    }
+                }
                 li:nth-child(3){
                     width:30%;
                     overflow: hidden;

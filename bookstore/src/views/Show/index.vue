@@ -1,8 +1,10 @@
 <template>
-     <Nav ></Nav>
-     <div class="view">
-      <RouterView></RouterView>
-     </div>
+      <div>
+         <Nav ></Nav>
+         <div class="view">
+            <RouterView></RouterView>
+         </div>
+      </div>
 </template>
  
  <script setup name="login">
@@ -13,7 +15,6 @@
  <style lang="scss" scoped>
    .view{
       width:100vw;
-      // height:90vh;
       background-color: $bgc_color;
       position:relative;
       top:10vh;

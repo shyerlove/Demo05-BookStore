@@ -34,6 +34,7 @@
     "src/**/*.vue",
     "src/**/**/*.vue",
     "src/*",
+    "src/utils/shopcar.js",
   ],
   "references": [
     {

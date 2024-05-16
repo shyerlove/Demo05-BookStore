@@ -1,28 +1,54 @@
 <template>
     <div class="search">
+        <span></span>
        <div :class="isMini?'search_inp search_inp_min':'search_inp'">
-            <input type="text" >
+            <input type="text" ref="inp">
             <button @click="search">搜索</button>
        </div>
-       <List :listDown="isMini" :list="0"></List>
+       <List :listDown="isMini" :list="list" v-show="s"></List>
     </div>
 </template>
 
 <script setup name="home">
+    import myAxios from '@/use/myAxios';
     import List from '../../components/List/index.vue'
-    import {ref} from 'vue'
+    import {reactive, ref} from 'vue'
 
+    const list = reactive([]);
     const isMini = ref(false) ;
-    const search = () => {
-        isMini.value = !isMini.value ;
+    const s = ref(false) ;
+    /* 搜索结果 */
+    const inp = ref();
+
+    const search = async () => {
+        isMini.value = true ;
+        s.value = true ;
+        /* 等待查询结果 */
+        const result = await myAxios({
+        method:'GET',
+        url:'/webapi/search',
+        params:{
+            book_name:inp.value.value
+        },
+        headers:{
+            'token':JSON.parse(sessionStorage.getItem('user')).token
+        }
+    })
+    Object.assign(list,result.data.data);
     }
 </script>
 
 <style lang="scss" scoped>
 .search{
     width: 100%;
-    height: 100%;
+    min-height: 90vh;
     position: relative;
+    background-color: $bgc_color;
+    &>span{
+        display: block;
+        width: 100vw;
+        height: 10vh;
+    }
     
     .search_inp{
         position: absolute;
@@ -59,6 +85,7 @@
             background-color:  $blueplus;
             font-size:20px;
             transition: all 0.2s;
+            color:white;
         }
         button:hover{
             cursor: pointer;

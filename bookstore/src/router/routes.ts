@@ -1,11 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home/index.vue'
-import Login from '../views/Login/index.vue'
-import Search from '../views/Search/index.vue'
-import Manage from '../views/Manage/index.vue'
-import Shopcar from '../views/ShopCar/index.vue'
-import My from '../views/My/index.vue'
-import Show from '../views/Show/index.vue'
+import grard from './grard'
+
 export default createRouter({
     history: createWebHistory(),
     routes: [
@@ -16,39 +11,53 @@ export default createRouter({
         {
             name: 'login',
             path: '/login',
-            component: Login
+            component: () => import('../views/Login/index.vue')
         },
         {
             name: 'show',
             path: '/show',
-            component: Show,
+            component: () => import('../views/Show/index.vue'),
             redirect: '/show/home',
+            meta: { requireAuth: true },
             children: [
                 {
                     name: 'home',
                     path: 'home',
-                    component: Home
+                    component: () => import('../views/Home/index.vue'),
+                    beforeEnter: grard.user
                 },
 
                 {
                     name: 'search',
                     path: 'search',
-                    component: Search
-                },
-                {
-                    name: 'manage',
-                    path: 'manage',
-                    component: Manage
+                    component: () => import('../views/Search/index.vue'),
+                    beforeEnter: grard.user
                 },
                 {
                     name: 'shopcar',
                     path: 'shopcar',
-                    component: Shopcar
+                    component: () => import('../views/ShopCar/index.vue'),
+                    beforeEnter: grard.user
                 },
                 {
                     name: 'my',
                     path: 'my',
-                    component: My
+                    component: () => import('../views/My/index.vue')
+                }
+            ]
+        },
+        {
+            name: 'man',
+            path: '/man',
+            component: () => import('../views/Show/index.vue'),
+            redirect: '/man/manage',
+            meta: { requireAuth: true },
+            children: [
+                {
+                    name: 'manage',
+                    path: 'manage',
+                    component: () => import('../views/Manage/index.vue'),
+                    beforeEnter: grard.manage
                 }
             ]
         }

@@ -5,9 +5,8 @@
 </template>
 
 <script setup name="login">
-    import {ref} from 'vue'
+    import {reactive, ref} from 'vue'
     import loginForm from './loginForm.vue'
-
     
 </script>
 

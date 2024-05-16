@@ -1,38 +1,38 @@
 <template>
     <el-menu 
-    :default-active="activeIndex"
-    class="el-menu-demo"
-    mode="horizontal"
-    :ellipsis="false">
+        :default-active="activeIndex"
+        class="el-menu-demo"
+        mode="horizontal"
+        :ellipsis="false"
+        router
+    >
         <el-menu-item>
             <img src="" alt="">
         </el-menu-item>
         <div class="flex-grow"></div>
-            
-            <RouterLink to="/show/home">
-                <el-menu-item index="1">首页</el-menu-item>
-            </RouterLink>
-            <RouterLink to="/show/search">
-                <el-menu-item index="2">搜索</el-menu-item>
-            </RouterLink>
-            <RouterLink to="/show/shopcar">
-                <el-menu-item index="3">购物车</el-menu-item>
-            </RouterLink>
-            <RouterLink to="/show/manage">
-                <el-menu-item index="4">管理</el-menu-item>
-            </RouterLink>
-            <RouterLink to="/show/my">
-                <el-menu-item index="5">个人中心</el-menu-item>
-            </RouterLink>
-            
+                <el-menu-item index="/show" v-if="user.role">首页</el-menu-item>
+                <el-menu-item index="/show/search" v-if="user.role">搜索</el-menu-item>
+                <el-menu-item index="/show/shopcar" v-if="user.role">购物车</el-menu-item>
+                <el-menu-item index="/man" v-if="!user.role">管理</el-menu-item>
+                <el-menu-item index="/show/my">个人中心</el-menu-item>            
     </el-menu>    
 </template>
  
  <script setup name="login">
-    import {RouterLink} from 'vue-router'
-    import {ref} from 'vue'
-    const activeIndex = ref('1') ;
-    
+    import { ref,onMounted ,watch} from 'vue'
+    import {useRouter} from 'vue-router'
+    const user = JSON.parse(sessionStorage.getItem('user')) ;
+    const activeIndex = ref(null) ;
+    const router = useRouter();
+    onMounted(() => {
+        if(user.role){
+            activeIndex.value = '/show' ;
+            router.push('/show') ;
+        }else{
+            activeIndex.value = '/man' ;
+            router.push('/man') ;
+        }
+    })
  </script>
  
  <style lang="scss" scoped>
