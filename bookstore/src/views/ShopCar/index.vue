@@ -34,42 +34,42 @@
     </div>
 </template>
 
-<script setup name="shopcar">
+<script setup name="shopcar" lang="ts">
     import Shopcard from '../../components/Shopcard/index.vue'
-    import {computed,reactive,ref,watch,onMounted} from 'vue'
+    import {computed,reactive,ref,watch} from 'vue'
     import {ElMessage} from 'element-plus'
     import myAxios from '@/use/myAxios';
     import fenlei from '@/utils/shopcar.js'
-    const user = JSON.parse(sessionStorage.getItem('user')) ;
+    const user = JSON.parse(sessionStorage.getItem('user') as string) ;
 
+    type shopCard = {
+        book_id: number,
+        book_name: string,
+        book_press: string,
+        store_name: string,
+        book_imgUrl: string,
+        book_count:number,
+        book_cost: number,
+        book_price: number
+        isSelect: boolean
+    }
     /* 初始化数据 */
     const obj = reactive({
         showcarData: []
     })
-    const show = () => {
-        myAxios({
-            method:'POST',
-            url:'/webapi/shopCar',
-            params:{id:1},
-            headers:{
-                'token':JSON.parse(sessionStorage.getItem('user')).token
-            }
-        }).then(res=>{
-            obj.showcarData = fenlei(res.data.data) ;
-        }).catch(err=>{
-            console.log(err);
-        })
+    const show = async () => {
+        obj.showcarData = fenlei((await myAxios.post('/webapi/shopCar',{id:user.id})).data.data); 
     }
     /* 初始化数据 */
     show();
     /* 计算购买的数量 */
     let count = computed(() => {
         let temVal = 0 ;
-        obj.showcarData.forEach(i=>{
+        (obj.showcarData as shopCard[][]).forEach(i=>{
             i.forEach( j => {
                 j.isSelect
-                ? temVal += j.book_count
-                : []
+                    ? temVal += j.book_count
+                    : []
             })
         })
         return temVal ;
@@ -77,7 +77,7 @@
     /* 计算购买的总价 */
     let allPrice = computed(() => {
         let temVal = 0 ;
-        obj.showcarData.forEach(i=>{
+        (obj.showcarData as shopCard[][]).forEach(i=>{
             i.forEach( j => {
                 j.isSelect
                 ? temVal += j.book_count * j.book_price
@@ -88,13 +88,13 @@
     })
     let isAll = ref(false) ; // 是否将购物车商品全部选中
     /* 选中该商家的全部商品 */
-    const get = (index,val) => {
-        obj.showcarData[index].map(item=>{
+    const get = (index:number,val:boolean) => {
+        (obj.showcarData[index] as shopCard[]).map(item=>{
             item.isSelect = val ;
         })
     }
     /* 判断是否将购物车全选 */
-    const w = watch(obj.showcarData,(newVal) => {
+    watch((obj.showcarData as shopCard[][]),(newVal) => {
         let tem = true ;
         newVal.forEach(i=>{
             i.forEach(j=>{
@@ -104,7 +104,7 @@
         isAll.value = tem ;
     })
 
-    let isClick = ref(false);
+    let isClick = ref<Boolean>(false);
     const all = () => {
         isClick.value = !isClick.value ;
         isAll.value = !isAll.value ;
@@ -113,7 +113,7 @@
     /* 支付 */
     const buy = () => {
         let book_id = 0 ;
-        obj.showcarData.forEach(i=>{
+        (obj.showcarData as shopCard[][]).forEach(i=>{
             i.forEach(j=>{
                 if(j.isSelect){
                     book_id = j.book_id ;
@@ -123,14 +123,11 @@
         myAxios({
             method:'POST',
             url:'/webapi/buyBook',
-            params:{
+            data:{
                 user_id: user.id,
                 book_id,
                 count:count.value
             },
-            headers:{
-                'token':user.token
-            }
         }).then(res=>{
             console.log(res.data);
             ElMessage({

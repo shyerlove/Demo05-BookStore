@@ -18,21 +18,25 @@
     </el-menu>    
 </template>
  
- <script setup name="login">
-    import { ref,onMounted ,watch} from 'vue'
-    import {useRouter} from 'vue-router'
-    const user = JSON.parse(sessionStorage.getItem('user')) ;
-    const activeIndex = ref(null) ;
-    const router = useRouter();
-    onMounted(() => {
-        if(user.role){
-            activeIndex.value = '/show' ;
-            router.push('/show') ;
-        }else{
-            activeIndex.value = '/man' ;
-            router.push('/man') ;
-        }
-    })
+ <script setup name="login" lang="ts">
+import { ref,onMounted ,watch} from 'vue'
+import {useRouter} from 'vue-router'
+// 获取用户信息
+const user = JSON.parse(sessionStorage.getItem('user') as string) ;
+// 创建路由对象
+const router = useRouter();
+// 当前路径
+const activeIndex = ref<string>('') ;
+/* 每次刷新页面都会跳回首页 */
+onMounted(() => {
+    if(user.role){
+        activeIndex.value = '/show' ;
+        router.push('/show') ;
+    }else{
+        activeIndex.value = '/man' ;
+        router.push('/man') ;
+    }
+})
  </script>
  
  <style lang="scss" scoped>

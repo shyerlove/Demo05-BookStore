@@ -2,7 +2,7 @@ const query = require('../db');
 
 const addShopcarController = (req, res) => {
     /* 获取请求参数 */
-    const { user_id, book_id, count } = req.query;
+    const { user_id, book_id, count } = req.body;
     /* 定义SQL语句 */
     const sql = 'call update_shopcar(?,?,?);'
     /* 连接数据库 */

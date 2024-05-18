@@ -28,64 +28,58 @@
     </div>
 </template>
 
-<script setup name="shopcard">
-    import myAxios from '@/use/myAxios';
-    import {Delete} from '@element-plus/icons-vue'
-    import { ElMessage } from 'element-plus'
-    import {ref,watch} from 'vue'
+<script setup name="shopcard" lang="ts">
+import myAxios from '@/use/myAxios';
+import {Delete} from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import {ref,watch} from 'vue'
 
-    const user = JSON.parse(sessionStorage.getItem('user'));
-    const prop = defineProps(['index','data','send','isAll','isClick','show']);
-    let myIsAll = ref(false) ; // 是否选中当前商家全部商品
+const user = JSON.parse(sessionStorage.getItem('user') as string);
+const prop = defineProps(['index','data','send','isAll','isClick','show']);
+// 是否选中当前商家全部商品
+let myIsAll = ref<boolean>(false) ; 
 
-    /* 选中该商家的全部商品 */
-    const allSelect = () => {
-        myIsAll.value = !myIsAll.value ;
-        prop.send(prop.index,myIsAll.value) ;
-    }
-    /* 判断是否全部选中同一个商家 */
-    const myAllSelect = (item) => {
-        item.isSelect = !item.isSelect ;
-        let tem  =  true ;
-        prop.data.forEach(e => {
-           if(!e.isSelect) tem = false ;
-        })
-        myIsAll.value = tem ;
-    }
-
-    /* 将购物车全部选中 */
-    const isAllWatch = watch(()=>prop.isClick,(newVal) => {
-        if(newVal){
-            myIsAll.value = true;
-            prop.send(prop.index,myIsAll.value);
-        }else{
-            myIsAll.value = false;
-            prop.send(prop.index,myIsAll.value);
-        }
+/* 选中该商家的全部商品 */
+const allSelect = () => {
+    myIsAll.value = !myIsAll.value ;
+    prop.send(prop.index,myIsAll.value) ;
+}
+/* 判断是否全部选中同一个商家 */
+const myAllSelect = (item:any) => {
+    item.isSelect = !item.isSelect ;
+    let tem  =  true ;
+    prop.data.forEach((e:any) => {
+        if(!e.isSelect) tem = false ;
     })
-    /* 点击移除出购物车 */
-    const delCard = (book_id) => {
-        console.log(book_id);
-        myAxios({
-            method:'POST',
-            url:'/webapi/delShopcar',
-            params:{
-                user_id: user.id,
-                book_id
-            },
-            headers:{
-                'token': user.token
-            }
-        }).then(res => {
-            ElMessage({
-                message:'移除成功',
-                type:'success'
-            });
-            prop.show(); 
-        }).catch(err => {
-           console.log(err);
+    myIsAll.value = tem ;
+}
+
+/* 将购物车全部选中 */
+watch(()=>prop.isClick,(newVal) => {
+    if(newVal){
+        myIsAll.value = true;
+        prop.send(prop.index,myIsAll.value);
+    }else{
+        myIsAll.value = false;
+        prop.send(prop.index,myIsAll.value);
+    }
+})
+/* 点击移除出购物车 */
+const delCard = async (book_id:number) => {
+    const data =  await myAxios.post('/webapi/delShopcar',{user_id: user.id,book_id});
+    if(data.status == 200){
+        ElMessage({
+            message:'移除成功',
+            type:'success'
+        });
+        prop.show(); 
+    }else{
+        ElMessage({
+            message:'移除失败',
+            type:'warning'
         });
     }
+}
 </script>
 
 <style lang="scss" scoped>

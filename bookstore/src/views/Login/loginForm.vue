@@ -45,18 +45,28 @@ import { ElMessage } from "element-plus";
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import myAxios from "@/use/myAxios";
+type loginForm = {
+  username: string;
+  password: string;
+}
+type signForm = {
+  username: string;
+  password: string;
+  phone: string;
+  identity: number;
+}
 
 // 创建路由对象
 const router = useRouter();
 // 声明表单状态 登录：true 注册：false
 let isLogin = ref<boolean>(true);
 // 登录表单数据
-const loginForm = reactive({
+const loginForm = reactive<loginForm>({
     username: "",
     password: "",
 });
 // 注册表单数据
-const signForm = reactive({
+const signForm = reactive<signForm>({
     username: "",
     password: "",
     phone: "",

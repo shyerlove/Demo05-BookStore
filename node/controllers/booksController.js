@@ -5,7 +5,7 @@
 const query = require('../db');
 
 const booksController = (req, res) => {
-    const { index, pageSize } = req.query;
+    const { index, pageSize } = req.body;
     /* 定义查询语句 */
     let sql = 'select * from books.bookData limit ?,?;';
     /* 查询数据库，获取购图书数据 */

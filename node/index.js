@@ -1,6 +1,7 @@
 // 导入express模块
 const express = require('express');
 const router = require('./webapi/router');
+const bodyParser = require('body-parser');
 //导入校验token的中间件
 const vToken = require('./middle/vToken');
 // 创建app实例
@@ -15,7 +16,7 @@ app.all('*', function (req, res, next) {
     res.header('Access-Control-Allow-Headers', ['token', 'Content-Type']);
     next();
 });
-
+app.use(bodyParser.json());
 app.use(vToken);
 app.use('/webapi', router);
 app.all((req, res) => {

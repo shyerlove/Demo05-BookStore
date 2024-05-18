@@ -8,11 +8,12 @@
     </div>  
 </template>
  
- <script setup name="slideshow">
+ <script setup name="slideshow" lang="ts">
     import {RouterLink} from 'vue-router'
     import {ref,reactive} from 'vue'
-    const activeIndex = ref('1') ;
-    const imgs = [
+    
+    const activeIndex = ref<string>('1') ;
+    const imgs: string[] = [
         '/src/assets/img1.png',
         '/src/assets/img2.png',
         '/src/assets/img3.png',

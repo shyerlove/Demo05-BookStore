@@ -5,37 +5,42 @@
             <input type="text" ref="inp">
             <button @click="search">搜索</button>
        </div>
-       <List :listDown="isMini" :list="list" v-show="s"></List>
+       <List
+            :listDown="isMini" 
+            :list="list"
+            v-show="isHaveBook"
+        />
+        <h1 v-show="!isHaveBook">暂无数据...</h1>
     </div>
 </template>
 
-<script setup name="home">
-    import myAxios from '@/use/myAxios';
-    import List from '../../components/List/index.vue'
-    import {reactive, ref} from 'vue'
+<script setup name="search" lang="ts">
+import myAxios from '@/use/myAxios';
+import List from '../../components/List/index.vue'
+import {reactive, ref} from 'vue'
 
-    const list = reactive([]);
-    const isMini = ref(false) ;
-    const s = ref(false) ;
-    /* 搜索结果 */
-    const inp = ref();
 
-    const search = async () => {
-        isMini.value = true ;
-        s.value = true ;
-        /* 等待查询结果 */
-        const result = await myAxios({
-        method:'GET',
-        url:'/webapi/search',
-        params:{
-            book_name:inp.value.value
-        },
-        headers:{
-            'token':JSON.parse(sessionStorage.getItem('user')).token
-        }
-    })
-    Object.assign(list,result.data.data);
+// 搜索列表数据
+const list = reactive([]);
+// 搜索框是否移动到左侧
+const isMini = ref<boolean>(false) ;
+// 是否有结果
+const isHaveBook = ref<boolean>(true) ;
+// 输入框
+const inp = ref<HTMLInputElement>(null);
+
+/* 搜索 */
+const search = async () => {
+    isMini.value = true ;
+    /* 等待查询结果 */
+    const result = await myAxios.get(`/webapi/search?book_name=${inp.value.value}`);
+    if(result.data.code == 200){
+        isHaveBook.value = true ;
+        Object.assign(list,result.data.data);
+    }else{
+        isHaveBook.value = false ;
     }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -44,6 +49,13 @@
     min-height: 90vh;
     position: relative;
     background-color: $bgc_color;
+    &>h1{
+        width:100%;
+        position: absolute;
+        top:40vh;
+        text-align: center;
+        color:$blueplus;
+    }
     &>span{
         display: block;
         width: 100vw;

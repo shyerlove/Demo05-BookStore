@@ -2,7 +2,6 @@ const query = require('../db');
 
 const signController = (req, res) => {
     const { phone, username, password, identity } = req.query;
-    console.log(req.query);
     /* 查询数据库，获取购物车数据 */
     let sql = 'insert into users(user_phone,user_name,user_password,user_identity) values(?,?,?,?)';
     query(sql, [phone, username, password, Number(identity)], (err, data) => {

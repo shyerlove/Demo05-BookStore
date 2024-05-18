@@ -1,6 +1,6 @@
 <template>
   <div :class="listDown?'list listDown':'list'">
-    <ul v-show="isHaveBook">
+    <ul >
         <li  v-for="item in list" :key="item" @click="dialog(item)">
             <div class="img"> <img :src="item.book_imgUrl" alt="加载中..."></div>
             <div class="tit">
@@ -10,15 +10,15 @@
             <span>{{item.book_name}}</span>
         </li>
     </ul>
-    <el-dialog v-model="dialogVisible" :title="bookMsg.store_name">
+    <el-dialog v-model="dialogVisible" :title="(bookMsg as Book).store_name">
         <el-row class="dialog">
             <el-col :span="12" class="left" >
-                <img :src="bookMsg.book_imgUrl" alt="加载中...">
+                <img :src="(bookMsg as Book).book_imgUrl" alt="加载中...">
             </el-col>
             <el-col :span="12" class="right">
-                <h1>{{bookMsg.book_name}}</h1>
-                <p>{{bookMsg.book_name}}</p>
-                <strong>￥ {{ bookMsg.book_price }}</strong>
+                <h1>{{(bookMsg as Book).book_name}}</h1>
+                <p>{{(bookMsg as Book).book_name}}</p>
+                <strong>￥ {{ (bookMsg as Book).book_price }}</strong>
                 <el-input-number v-model="num" :min="1" :max="100" class="number"/>
                <div class="btns">
                    <el-button type="warning" class="btn2" @click="addShopcar">加入购物车</el-button>
@@ -29,52 +29,45 @@
   </div>
 </template>
 
-<script setup name="list">
-    import myAxios from '@/use/myAxios';
-    import {reactive, ref} from 'vue'
-    import { ElMessage } from 'element-plus';
-    const user = JSON.parse(sessionStorage.getItem('user'));
-    const props = defineProps(['listDown','list']);
-    const bookMsg = reactive({});
-    let isHaveBook = ref(true);
-    /* 是否显示对话框 */
-    const dialogVisible = ref(false);
-    /* 购买的数量 */
-    const num = ref(1);
+<script setup name="list" lang="ts">
+import myAxios from '@/use/myAxios';
+import {reactive, ref} from 'vue'
+import { ElMessage } from 'element-plus';
+import type Book from '@/types/book';
+const user = JSON.parse(sessionStorage.getItem('user') as string);
+// 接收父组件传过来的数据
+const props = defineProps(['listDown','list']);
+// 弹框数据
+const bookMsg = reactive({});
+// 对话框状态
+const dialogVisible = ref<Boolean>(false);
+// 购买的数量
+const num = ref<Number>(1);
 
-    const dialog = (data) => {
-        /* 弹框 */
-        dialogVisible.value = true ;
-        Object.assign(bookMsg,data);
-    }
+/* 点击弹出对话框 */
+const dialog = (data:Book) => {
+    // 弹框
+    dialogVisible.value = true ;
+    // 初始化弹框数据
+    Object.assign(bookMsg,data);
+}
 
-    /* 加入购物车 */
-    const addShopcar = () => {
-        myAxios({
-            method:'POST',
-            url:'/webapi/addShopcar',
-            params:{
-                user_id: user.id,
-                book_id: bookMsg.book_id,
-                count: num.value
-            },
-            headers:{
-                'token': user.token
-            }
-        }).then(() => {
-            ElMessage({
-                message:'加入购物车成功，快去看看吧',
-                type:'success'
-            });
-            dialogVisible.value = false ;
-        }).catch(err=>{
-            console.log(err);
-            ElMessage({
-                message:'加入购物车失败',
-                type:'warning'
-            });
-        })
-    }
+/* 加入购物车 */
+const addShopcar = async () => {
+    const result = await myAxios.post('/webapi/addShopcar',{user_id: user.id,book_id: (bookMsg as Book).book_id,count: num.value});
+    if(result.data.code == 200){
+        ElMessage({
+            message:'加入购物车成功，快去看看吧',
+            type:'success'
+        });
+        dialogVisible.value = false ;
+    }else{
+        ElMessage({
+            message:'加入购物车失败',
+            type:'warning'
+        });
+    }   
+}
 
 </script>
 

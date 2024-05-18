@@ -14,44 +14,25 @@
 </template>
 
 <script setup name="home">
-
     import Slideshow from '../../components/Slideshow/index.vue'
     import List from '../../components/List/index.vue'
     import Divider from '../../components/Divider/index.vue'
     import { reactive } from 'vue'
     import myAxios from '@/use/myAxios';
-
+    // 页面数据
     const dataList = reactive({
         top:[],
         novel:[],
         special_offer:[]
     })
     /* 获取数据 */
-    myAxios({
-        method:'GET',
-        url:'/webapi/getTop',
-        headers:{
-            'token':JSON.parse(sessionStorage.getItem('user')).token
-        }
-    }).then(res => {
+    myAxios.get('/webapi/getTop').then(res => {
         dataList.top = res.data.data ;
     });
-    myAxios({
-        method:'GET',
-        url:'/webapi/getSpecial',
-        headers:{
-            'token':JSON.parse(sessionStorage.getItem('user')).token
-        }
-    }).then(res => {
+    myAxios.get('/webapi/getSpecial').then(res => {
         dataList.special_offer = res.data.data ;
     });
-    myAxios({
-        method:'GET',
-        url:'/webapi/getNovel',
-        headers:{
-            'token':JSON.parse(sessionStorage.getItem('user')).token
-        }
-    }).then(res => {
+    myAxios.get('/webapi/getNovel').then(res => {
         dataList.novel = res.data.data ;
     });
 

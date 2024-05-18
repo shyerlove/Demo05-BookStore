@@ -7,7 +7,6 @@
 <script setup name="login">
     import {reactive, ref} from 'vue'
     import loginForm from './loginForm.vue'
-    
 </script>
 
 <style lang="scss" scoped>

@@ -25,7 +25,6 @@
     const esc = () => {        
         sessionStorage.removeItem('user') ;
         myRouter.replace('/login');
-        // history.replaceState({},'','http://localhost:5173/login');
     }
 </script>
 

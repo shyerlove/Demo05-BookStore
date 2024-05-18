@@ -4,7 +4,7 @@
             <tr class="tb_head">
                 <th>编号</th><th>书名</th><th>出版社</th><th>库存</th><th>成本价</th><th>定价</th><th>操作</th>
             </tr>
-            <tr v-for="b in state.temPage" :key="b.book_id" class="tb_list">
+            <tr v-for="b in state.temPage" :key="(b as Book).book_id" class="tb_list">
                 <td>{{ b.book_id }}</td>
                 <td>{{ b.book_name }}</td>
                 <td>{{ b.book_press }}</td>
@@ -36,21 +36,21 @@
             >
                 <el-form-item label="书名" prop="book_name">
                     <el-input
-                        v-model="state.formData.book_name"
+                        v-model="(state.formData as Book).book_name"
                         type="text"
                         autocomplete="off"
                     />
                 </el-form-item>
                 <el-form-item label="出版社" prop="book_press">
                     <el-input
-                    v-model="state.formData.book_press"
+                    v-model="(state.formData as Book).book_press"
                         type="text"
                         autocomplete="off"
                     />
                 </el-form-item>
                 <el-form-item label="商家" prop="store_name">
                     <el-input
-                    v-model="state.formData.store_name"
+                    v-model="(state.formData as Book).store_name"
                         type="text"
                         autocomplete="off"
                     />
@@ -59,21 +59,21 @@
                     <label>
                         <el-image 
                             class="bookImg" 
-                            :src="state.formData.book_imgUrl" 
+                            :src="(state.formData as Book).book_imgUrl" 
                             fit="cover" 
                             title="点击上传"
                         />
-                        <input type="file" style="opacity: 0;" @change="upload">
+                        <input type="file" style="opacity: 0;">
                     </label>
                 </el-form-item>
                 <el-form-item label="库存" prop="book_inventory">
-                    <el-input-number v-model="state.formData.book_inventory" :min="0" :max="1000"  />
+                    <el-input-number v-model="(state.formData as Book).book_inventory" :min="0" :max="1000"  />
                 </el-form-item>
                 <el-form-item label="成本价" prop="book_cost">
-                    <el-input-number v-model="state.formData.book_cost" :min="0" :max="1000"  />
+                    <el-input-number v-model="(state.formData as Book).book_cost" :min="0" :max="1000"  />
                 </el-form-item>
                 <el-form-item label="定价" prop="book_price">
-                    <el-input-number v-model="state.formData.book_price" :min="0" :max="1000"  />
+                    <el-input-number v-model="(state.formData as Book).book_price" :min="0" :max="1000"  />
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="dialogTableVisible=false">取消</el-button>
@@ -84,64 +84,63 @@
     </div>
 </template>
 
-<script setup name="manage">
-    import axios from "axios";
-    import myAxios from "@/use/myAxios";
-    import { reactive,ref, watch } from "vue";
-    import { ElMessage} from 'element-plus'
+<script setup name="manage" lang="ts">
+import myAxios from "@/use/myAxios";
+import { reactive,ref } from "vue";
+import { ElMessage} from 'element-plus'
+import type Book from '@/types/book';
+type state = {
+    temPage:Array<Book>|[],
+    formData:Book|{}
+}
 
-    const user = JSON.parse(sessionStorage.getItem('user')) ;
-    let nowPage = ref(1); // 当前页数
-    const pageSize = 5 ; // 每页展示多少
-    let total = ref(0) ; // 一共有几条数据
-    const formRef = ref();
-    /* 一页的数据 */
-    const state = reactive({
-        temPage:[],
-        formData:{}
-    }) ;
-    const dialogTableVisible = ref(false);
-    /* 获取图书总数 */
-    let img = ref(null);
-    myAxios({
-        method:'GET',
-        url:'webapi/getAll',
-        headers:{
-            'token': user.token 
-        }
-    }).then(res=>{
-        total.value = res.data.data[0].count ;
-    })
+// 当前页数
+let nowPage = ref<number>(1); 
+// 每页展示多少
+const pageSize:number = 5 ; 
+// 一共有几条数据
+let total = ref<number>(0);
+//一页的数据
+const state = reactive<state>({
+    temPage:[],
+    formData:{}
+}) ;
+// 声明弹窗状态
+const dialogTableVisible = ref<boolean>(false);
+/* 图片信息 */
+let imgUrl = ref<string>('');
+// 获取总图书量
+myAxios.get('webapi/getAll').then(res=>{
+    total.value = res.data.data[0].count;
+})
+    
+/* 渲染函数，向后端请求数据进行重渲染 */
 const show = () => {
     myAxios({
         method:'POST',
         url:'webapi/books',
-        params:{
+        data:{
             index: (nowPage.value - 1) * pageSize,
             pageSize
         },
-        headers:{
-            'token': user.token 
-        }
     }).then(res=>{
         state.temPage = res.data.data ;
-        console.log(state.temPage);
     })
 }
 show();
 /* 当前页面改变时，重新获取数据 */
-const change = (cur) => {
+const change = (cur:number) => {
     nowPage.value = cur ;
     show();
 }
 
 /* 打开编辑框 */
-const edit = (book) => {
+const edit = (book:Book) => {
     /* 弹出编辑框 */
     dialogTableVisible.value = true ;
     /* 初始化数据 */
     state.formData = book ;
-    img.value = state.formData.book_imgUrl ;
+    imgUrl.value = (state.formData as Book).book_imgUrl ;
 }
 
 // const upload =  (e) => {
@@ -153,16 +152,12 @@ const edit = (book) => {
 // }
 /* 确认修改 */
 const confirm = () => {
-    
     myAxios({
         method:'POST',
         url:'/webapi/updateBook',
-        params:{
+        data:{
             formData:state.formData
         },
-        headers:{
-            'token': user.token
-        }
     }).then(res=>{
         ElMessage({message:'修改成功!',type:'success'});
         dialogTableVisible.value = false;

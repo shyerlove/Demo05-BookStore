@@ -7,7 +7,6 @@
 </template>
 
 <script setup name="divider">
-
     const props = defineProps(['h1']) ;
 </script>
 
