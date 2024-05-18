@@ -1,5 +1,6 @@
 const express = require('express');
 
+const signController = require('../controllers/signController');
 const addShopcarController = require('../controllers/addShopcarController');
 const booksController = require('../controllers/booksController');
 const buyBookController = require('../controllers/buyBookController');
@@ -15,6 +16,10 @@ const updateBookController = require('../controllers/updateBookController');
 /* 创建路由对象 */
 const router = express.Router();
 
+// 注册
+router.post('/sign', signController);
+// 登录
+router.post('/login', loginController);
 // 添加至购物车
 router.post('/addShopcar', addShopcarController);
 // 分页获取图书信息
@@ -23,8 +28,6 @@ router.post('/books', booksController);
 router.post('/buyBook', buyBookController);
 // 从购物车移除
 router.post('/delShopcar', delShopcarController);
-// 登录
-router.post('/login', loginController);
 // 搜索
 router.get('/search', searchController);
 // 获取购物车信息

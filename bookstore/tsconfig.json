@@ -8,9 +8,15 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "baseUrl": "src",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -21,20 +27,16 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
   },
   "include": [
+    "src/**/*",
     "src/**/*.ts",
+    "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
-    "src/**/**/*.vue",
-    "src/*",
-    "src/utils/shopcar.js",
+    "src/**/*.vue"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "references": [
     {
