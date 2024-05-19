@@ -27,13 +27,13 @@ const isMini = ref<boolean>(false) ;
 // 是否有结果
 const isHaveBook = ref<boolean>(true) ;
 // 输入框
-const inp = ref<HTMLInputElement>(null);
+const inp = ref<HTMLInputElement>();
 
 /* 搜索 */
 const search = async () => {
     isMini.value = true ;
     /* 等待查询结果 */
-    const result = await myAxios.get(`/webapi/search?book_name=${inp.value.value}`);
+    const result = await myAxios.get(`/webapi/search?book_name=${inp.value?.value}`);
     if(result.data.code == 200){
         isHaveBook.value = true ;
         Object.assign(list,result.data.data);

@@ -3,7 +3,7 @@ const JWT = require('../utils/jwt');
 /* 每次发送请求时，校验token */
 const vToken = (req, res, next) => {
     /* 登录时不用校验 */
-    if (req.path === '/webapi/login' || req.path === '/webapi/sign') {
+    if (req.path === '/webapi/login' || req.path === '/webapi/sign' || req.path === '/img') {
         next();
         return;
     }

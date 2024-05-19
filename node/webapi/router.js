@@ -1,4 +1,5 @@
 const express = require('express');
+const multer = require('multer');
 
 const signController = require('../controllers/signController');
 const addShopcarController = require('../controllers/addShopcarController');
@@ -13,8 +14,10 @@ const getSpecialController = require('../controllers/getSpecialController');
 const getNovelController = require('../controllers/getNovelController');
 const getAllController = require('../controllers/getAllController');
 const updateBookController = require('../controllers/updateBookController');
+const addBookController = require('../controllers/addBookController');
 /* 创建路由对象 */
 const router = express.Router();
+const upload = multer();
 
 // 注册
 router.post('/sign', signController);
@@ -40,8 +43,10 @@ router.get('/getSpecial', getSpecialController);
 router.get('/getNovel', getNovelController);
 // 获取图书总信息
 router.get('/getAll', getAllController);
+// 新增图书
+router.post('/addBook', upload.any(), addBookController);
 // 修改图书信息
-router.post('/updateBook', updateBookController);
+router.post('/updateBook', upload.any(), updateBookController);
 
 
 /* 导出路由 */

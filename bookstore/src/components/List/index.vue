@@ -2,7 +2,7 @@
   <div :class="listDown?'list listDown':'list'">
     <ul >
         <li  v-for="item in list" :key="item" @click="dialog(item)">
-            <div class="img"> <img :src="item.book_imgUrl" alt="加载中..."></div>
+            <div class="img"> <img :src="'http://127.0.0.1:3002/img?i='+item.book_imgUrl" alt="加载中..."></div>
             <div class="tit">
                 <h2>{{ item.book_name }}</h2>
                 <strong>￥{{ item.book_price }}</strong>
@@ -13,7 +13,7 @@
     <el-dialog v-model="dialogVisible" :title="(bookMsg as Book).store_name">
         <el-row class="dialog">
             <el-col :span="12" class="left" >
-                <img :src="(bookMsg as Book).book_imgUrl" alt="加载中...">
+                <img :src="'http://127.0.0.1:3002/img?i='+(bookMsg as Book).book_imgUrl" alt="加载中...">
             </el-col>
             <el-col :span="12" class="right">
                 <h1>{{(bookMsg as Book).book_name}}</h1>

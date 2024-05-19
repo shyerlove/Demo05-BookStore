@@ -14,7 +14,7 @@
                 />
             </li>
             <li>
-                <img :src="item.book_imgUrl" alt="加载中...">
+                <img src="http://127.0.0.1:3002/img?i=1.png" alt="加载中...">
                 <span>{{ item.book_name }}</span>
             </li>
             <li>{{ item.book_name }}</li>

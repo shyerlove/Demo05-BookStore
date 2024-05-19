@@ -18,6 +18,7 @@ const booksController = (req, res) => {
                 data: null
             })
         }
+        const { book_imgUrl } = data;
         res.json({
             code: 200,
             msg: '获取图书数据成功',

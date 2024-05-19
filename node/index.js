@@ -1,12 +1,15 @@
 // 导入express模块
 const express = require('express');
+// 导入路由
 const router = require('./webapi/router');
+// 
+const api = require('./api/img');
+// 导入bodyparser模块
 const bodyParser = require('body-parser');
 //导入校验token的中间件
 const vToken = require('./middle/vToken');
 // 创建app实例
 const app = express();
-
 
 /* 配置跨域 */
 app.all('*', function (req, res, next) {
@@ -19,6 +22,7 @@ app.all('*', function (req, res, next) {
 app.use(bodyParser.json());
 app.use(vToken);
 app.use('/webapi', router);
+app.use('/', api);
 app.all((req, res) => {
     res.json({
         code: 404,

@@ -1,22 +1,27 @@
 <template>
     <div class="manage" >
        <table class="tb">
-            <tr class="tb_head">
-                <th>编号</th><th>书名</th><th>出版社</th><th>库存</th><th>成本价</th><th>定价</th><th>操作</th>
-            </tr>
-            <tr v-for="b in state.temPage" :key="(b as Book).book_id" class="tb_list">
-                <td>{{ b.book_id }}</td>
-                <td>{{ b.book_name }}</td>
-                <td>{{ b.book_press }}</td>
-                <td>{{ b.book_inventory }}</td>
-                <td>{{ b.book_cost }}</td>
-                <td>{{ b.book_price }}</td>
-                <td>
-                    <el-button type="primary" size="small" @click="edit(b)">编辑</el-button>
-                    <el-button type="success" size="small">查看</el-button>
-                </td>
-            </tr>
+           <thead>
+                <tr class="tb_head">
+                    <th>编号</th><th>书名</th><th>出版社</th><th>库存</th><th>成本价</th><th>定价</th><th>操作</th>
+                </tr>
+           </thead>
+           <tbody>
+                <tr v-for="b in state.temPage" :key="(b as Book).book_id" class="tb_list">
+                    <td>{{ b.book_id }}</td>
+                    <td>{{ b.book_name }}</td>
+                    <td>{{ b.book_press }}</td>
+                    <td>{{ b.book_inventory }}</td>
+                    <td>{{ b.book_cost }}</td>
+                    <td>{{ b.book_price }}</td>
+                    <td>
+                        <el-button type="primary" size="small" @click="edit(b,false)">编辑</el-button>
+                        <el-button type="success" size="small" @click="look(b)">查看</el-button>
+                    </td>
+                </tr>
+           </tbody>
         </table>
+        <el-button type="primary" class="add" @click="add">新增</el-button>
         <div class="page">
             <el-pagination 
                 background 
@@ -59,11 +64,11 @@
                     <label>
                         <el-image 
                             class="bookImg" 
-                            :src="(state.formData as Book).book_imgUrl" 
+                            :src="src" 
                             fit="cover" 
                             title="点击上传"
                         />
-                        <input type="file" style="opacity: 0;">
+                        <input type="file" style="opacity: 0;" @change="upload">
                     </label>
                 </el-form-item>
                 <el-form-item label="库存" prop="book_inventory">
@@ -77,9 +82,16 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="dialogTableVisible=false">取消</el-button>
-                    <el-button type="primary" @click="confirm">确认修改</el-button>
+                    <el-button type="primary" @click="confirm">{{ isAdd?'添加':'确认修改' }}</el-button>
                 </el-form-item>
             </el-form>
+        </el-dialog>
+        <!-- 点击查看，进行图片预览 -->
+        <el-dialog v-model="imgDialog" class="imgDialog">
+            <el-image  
+                :src="src" 
+                fit="cover" 
+            />
         </el-dialog>
     </div>
 </template>
@@ -89,6 +101,8 @@ import myAxios from "@/use/myAxios";
 import { reactive,ref } from "vue";
 import { ElMessage} from 'element-plus'
 import type Book from '@/types/book';
+import toBuffer from "@/utils/urlToBuffer";
+import hash from '@/utils/hash';
 type state = {
     temPage:Array<Book>|[],
     formData:Book|{}
@@ -100,15 +114,20 @@ let nowPage = ref<number>(1);
 const pageSize:number = 5 ; 
 // 一共有几条数据
 let total = ref<number>(0);
-//一页的数据
+// 一页的数据
 const state = reactive<state>({
-    temPage:[],
-    formData:{}
+    temPage:[], // 每一页的数据
+    formData:{} // 对话框中的临时数据
 }) ;
 // 声明弹窗状态
 const dialogTableVisible = ref<boolean>(false);
-/* 图片信息 */
-let imgUrl = ref<string>('');
+// 新增：true 修改：false
+const isAdd = ref<boolean>(false);
+// 记录对话框的临时src
+let src = ref<string>('');
+// 是否开启图片预览
+const imgDialog = ref<boolean>(false);
+
 // 获取总图书量
 myAxios.get('webapi/getAll').then(res=>{
     total.value = res.data.data[0].count;
@@ -127,6 +146,7 @@ const show = () => {
         state.temPage = res.data.data ;
     })
 }
+// 组件初次创建之前初始化数据
 show();
 /* 当前页面改变时，重新获取数据 */
 const change = (cur:number) => {
@@ -135,35 +155,93 @@ const change = (cur:number) => {
 }
 
 /* 打开编辑框 */
-const edit = (book:Book) => {
+const edit = (book:Book,isadd:boolean) => {
+    // 确定是添加还是修改
+    isAdd.value = isadd ;
     /* 弹出编辑框 */
     dialogTableVisible.value = true ;
     /* 初始化数据 */
     state.formData = book ;
-    imgUrl.value = (state.formData as Book).book_imgUrl ;
+    // 初始化src
+    src.value = 'http://127.0.0.1:3002/img?i='+(state.formData as Book).book_imgUrl;
+    
 }
 
-// const upload =  (e) => {
-//     const reader = new FileReader();
-//     reader.readAsDataURL(e.target.files[0]);
-//     reader.onload = async (event) => {
-//         img.value  =  await event.target.result;
-//     }
-// }
+/* 更换图书图片 */
+const upload =  (e:Event) => {
+    const reader = new FileReader();
+    reader.readAsDataURL((e.target as HTMLFormElement).files[0]);
+    reader.onload = async (event) => {
+        src.value = (event.target?.result as string) ;
+    }
+}
+/* 添加图书 */
+const add = () => {
+    state.formData = {
+        book_id:0,
+        book_name:'',
+        book_press:'',
+        store_name:'',
+        book_imgUrl:'',
+        book_inventory:0,
+        book_cost:0,
+        book_price:0,
+    };
+    edit(state.formData as Book,true);
+}
 /* 确认修改 */
-const confirm = () => {
-    myAxios({
-        method:'POST',
-        url:'/webapi/updateBook',
-        data:{
-            formData:state.formData
-        },
-    }).then(res=>{
-        ElMessage({message:'修改成功!',type:'success'});
-        dialogTableVisible.value = false;
-    }).catch(err=>{
-        console.error(err);
-    })
+const confirm = async () => {
+    // 创建formdata对象
+    const formdata = new FormData();
+    // 获取
+    let blob = await toBuffer((state.formData as Book).book_imgUrl) ;
+    const h = await hash(blob);
+    formdata.append('hash',h as string);
+    formdata.append('book_id',(state.formData as Book).book_id.toString());
+    formdata.append('book_name',(state.formData as Book).book_name);
+    formdata.append('book_press',(state.formData as Book).book_press);
+    formdata.append('store_name',(state.formData as Book).store_name);
+    formdata.append('book_imgUrl',blob);
+    formdata.append('book_inventory',(state.formData as Book).book_inventory.toString());
+    formdata.append('book_cost',(state.formData as Book).book_cost.toString());
+    formdata.append('book_price',(state.formData as Book).book_price.toString());
+    if(isAdd.value){        
+        myAxios({
+            method:'POST',
+            url:'/webapi/addBook',
+            data:formdata,
+            headers:{
+                'Content-Type':'multipart/form-data'
+            }
+        }).then(res => {
+            ElMessage({message:'添加成功!',type:'success'});
+            dialogTableVisible.value = false;
+            show();
+        }).catch(err=>{
+            console.error(err);
+        })  
+    }else{        
+        myAxios({
+            method:'POST',
+            url:'/webapi/updateBook',
+            data:formdata,
+            headers:{
+                'Content-Type':'multipart/form-data'
+            }
+        }).then(res => {
+            ElMessage({message:'修改成功!',type:'success'});
+            dialogTableVisible.value = false;
+            show();
+        }).catch(err=>{
+            console.error(err);
+        })  
+    }
+}
+
+const look = (book:Book) => {
+    imgDialog.value = !imgDialog.value;
+    state.formData = book ;
+    src.value = 'http://127.0.0.1:3002/img?i='+(state.formData as Book).book_imgUrl;
 }
 </script>
 
@@ -178,32 +256,43 @@ const confirm = () => {
             bottom:2vh;
             right:2vw;
         }
+        .add{
+            position: fixed;
+            bottom:2vh;
+            left:2vw;
+        }
         .tb{
             width:100%;
-            height: 90%;
             border-collapse: collapse;
-           .tb_head{
+            .tb_head{
+                width:100%;
+                height: 10vh;
                 background-color: white;
                 th{
-                    height: 70px;
+                    height: 100%;
                     color:$blueplus;
                     text-align: center;
                     border:1px solid #EBEEF5;
                 }
             }
-           .tb_list{
-                background-color: #ecf5ff;
-                transition: all .2s ;
-                td{
-                    height: 50px;
-                    color:$blue;
-                    text-align: center;
-                    border:1px solid #EBEEF5;
+            tbody{
+                width:100%;
+                .tb_list{
+                    width: 100%;
+                    background-color: #ecf5ff;
+                    transition: all .2s ;
+                    td{
+                        height:14vh;
+                        color:$blue;
+                        text-align: center;
+                        border:1px solid #EBEEF5;
+                    }
+                }
+                .tb_list:hover{
+                    background-color: #DCDFE6;
                 }
             }
-           .tb_list:hover{
-                background-color: #DCDFE6;
-            }
+           
         }
         .bookImg{
             width:100px;
@@ -229,6 +318,12 @@ const confirm = () => {
                 cursor: pointer;
                 display: block;
             }
+        }
+        .imgDialog{
+          div{
+            display: flex;
+            align-items: center;
+          }
         }
     }
 </style>
