@@ -14,7 +14,7 @@
                 />
             </li>
             <li>
-                <img src="http://127.0.0.1:3002/img?i=1.png" alt="加载中...">
+                <img :src="'http://127.0.0.1:3002/img?i='+item.book_imgUrl" alt="加载中...">
                 <span>{{ item.book_name }}</span>
             </li>
             <li>{{ item.book_name }}</li>
@@ -35,7 +35,7 @@ import { ElMessage } from 'element-plus'
 import {ref,watch} from 'vue'
 
 const user = JSON.parse(sessionStorage.getItem('user') as string);
-const prop = defineProps(['index','data','send','isAll','isClick','show']);
+const prop = defineProps(['index','data','send','isAll','isClick','show','del']);
 // 是否选中当前商家全部商品
 let myIsAll = ref<boolean>(false) ; 
 

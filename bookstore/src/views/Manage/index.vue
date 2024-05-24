@@ -125,6 +125,8 @@ const dialogTableVisible = ref<boolean>(false);
 const isAdd = ref<boolean>(false);
 // 记录对话框的临时src
 let src = ref<string>('');
+// 记录dataurl
+const file = ref<string>('');
 // 是否开启图片预览
 const imgDialog = ref<boolean>(false);
 
@@ -172,7 +174,8 @@ const upload =  (e:Event) => {
     const reader = new FileReader();
     reader.readAsDataURL((e.target as HTMLFormElement).files[0]);
     reader.onload = async (event) => {
-        src.value = (event.target?.result as string) ;
+        file.value = src.value = (event.target?.result as string) ;
+
     }
 }
 /* 添加图书 */
@@ -194,7 +197,7 @@ const confirm = async () => {
     // 创建formdata对象
     const formdata = new FormData();
     // 获取
-    let blob = await toBuffer((state.formData as Book).book_imgUrl) ;
+    let blob = await toBuffer(file.value) ;
     const h = await hash(blob);
     formdata.append('hash',h as string);
     formdata.append('book_id',(state.formData as Book).book_id.toString());
@@ -205,6 +208,7 @@ const confirm = async () => {
     formdata.append('book_inventory',(state.formData as Book).book_inventory.toString());
     formdata.append('book_cost',(state.formData as Book).book_cost.toString());
     formdata.append('book_price',(state.formData as Book).book_price.toString());
+
     if(isAdd.value){        
         myAxios({
             method:'POST',

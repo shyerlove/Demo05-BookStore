@@ -8,7 +8,7 @@ const myAxios = axios.create({
 myAxios.interceptors.request.use(
     config => {
         // 判断是否是需要token的请求
-        if (config.url === '/webapi/login' || config.url === 'webapi/sign') {
+        if (config.url === '/webapi/login' || config.url === '/webapi/sign') {
             return config;
         } else {
             config.headers = <any>{

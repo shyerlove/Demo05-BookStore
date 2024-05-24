@@ -13,6 +13,7 @@ const updateBookController = (req, res) => {
         book_id
     } = req.body;
     const { buffer, mimetype } = req.files[0];
+
     // 获取文件后缀名
     const type = mimetype.slice((mimetype.indexOf('/') + 1));
     // 生成图片名

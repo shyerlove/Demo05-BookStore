@@ -13,7 +13,6 @@ router.get('/img', (req, res) => {
                 code: 404,
             });
         }
-        console.log(type);
         res.header('Content-Type', `image/${type}`);
         res.send(data);
     });
