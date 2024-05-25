@@ -19,11 +19,15 @@
 
 <script setup name="my">
     import { useRouter } from 'vue-router';
-    const user = JSON.parse(sessionStorage.getItem('user'));
+    import { useStore } from 'vuex' ;
+    const userStore = useStore();
+    const {user} = userStore.state;
     const myRouter = useRouter() ;
 
     const esc = () => {        
+        // 清除用户数据
         sessionStorage.removeItem('user') ;
+        userStore.commit('clearUser') ;
         myRouter.replace('/login');
     }
 </script>

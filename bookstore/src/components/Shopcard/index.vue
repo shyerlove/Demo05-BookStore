@@ -33,8 +33,11 @@ import myAxios from '@/use/myAxios';
 import {Delete} from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import {ref,watch} from 'vue'
+import {useStore} from 'vuex'
 
-const user = JSON.parse(sessionStorage.getItem('user') as string);
+const userStore = useStore();
+
+const {user} = userStore.state;
 const prop = defineProps(['index','data','send','isAll','isClick','show','del']);
 // 是否选中当前商家全部商品
 let myIsAll = ref<boolean>(false) ; 

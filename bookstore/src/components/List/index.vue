@@ -32,9 +32,11 @@
 <script setup name="list" lang="ts">
 import myAxios from '@/use/myAxios';
 import {reactive, ref} from 'vue'
+import {useStore} from 'vuex'
 import { ElMessage } from 'element-plus';
 import type Book from '@/types/book';
-const user = JSON.parse(sessionStorage.getItem('user') as string);
+const userStore = useStore();
+const {user} = userStore.state;
 // 接收父组件传过来的数据
 const props = defineProps(['listDown','list']);
 // 弹框数据

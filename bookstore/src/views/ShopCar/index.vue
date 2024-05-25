@@ -40,10 +40,13 @@
 <script setup name="shopcar" lang="ts">
 import Shopcard from '../../components/Shopcard/index.vue'
 import {computed,reactive,ref,watch} from 'vue'
+import {useStore} from 'vuex'
 import {ElMessage} from 'element-plus'
 import myAxios from '@/use/myAxios';
 import fenlei from '@/utils/shopcar.js'
-const user = JSON.parse(sessionStorage.getItem('user') as string) ;
+// 获取用户基本数据
+const userStore = useStore();
+const {user} = userStore.state;
 
 type shopCard = {
     book_id: number,

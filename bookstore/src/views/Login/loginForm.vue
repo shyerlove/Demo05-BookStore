@@ -42,7 +42,8 @@
 
 <script setup name="loginForm" lang="ts">
 import { ElMessage } from "element-plus";
-import { ref, reactive } from "vue";
+import { ref, reactive} from "vue";
+import { useStore } from 'vuex';
 import { useRouter } from "vue-router";
 import myAxios from "@/use/myAxios";
 type loginForm = {
@@ -55,6 +56,7 @@ type signForm = {
   phone: string;
   identity: number;
 }
+const userStore = useStore();
 
 // 创建路由对象
 const router = useRouter();
@@ -101,6 +103,9 @@ const login = () => {
         const user = res.data.data;
         // 存放在本地存储中
         sessionStorage.setItem("user", JSON.stringify(user));
+        // 初始化store
+        userStore.commit('initUser',user);
+        
         // 提示登录成功
         ElMessage({
           message: "登录成功，欢迎回来",

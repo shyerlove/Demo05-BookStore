@@ -19,10 +19,13 @@
 </template>
  
  <script setup name="login" lang="ts">
-import { ref,onMounted ,watch} from 'vue'
+import { ref,onMounted } from 'vue'
+import { useStore } from 'vuex';
 import {useRouter} from 'vue-router'
+// 获取userstore
+const userStore = useStore();
 // 获取用户信息
-const user = JSON.parse(sessionStorage.getItem('user') as string) ;
+const {user} = userStore.state ;
 // 创建路由对象
 const router = useRouter();
 // 当前路径
