@@ -1,6 +1,6 @@
 <template>
   <div class="loginForm">
-    <div class="form" v-if="isLogin">
+    <div class="form" v-show="isLogin">
       <input
         type="text"
         placeholder="用户名"
@@ -12,9 +12,12 @@
         v-model="loginForm.password"
       />
       <button @click="login">登录</button>
-      <a @click="tabLogin">没有账号？点击注册</a>
+      <div class="bottom">
+        <a @click="forget">忘记密码</a>
+        <a @click="tabLogin">没有账号？点击注册</a>
+      </div>
     </div>
-    <div class="form" v-if="!isLogin">
+    <div class="form" v-show="!isLogin">
       <input
         type="text"
         placeholder="用户名"
@@ -35,7 +38,10 @@
         <el-radio :value="0" border style="color:white">管理员</el-radio>
       </el-radio-group>
       <button @click="sign">注册</button>
-      <a @click="tabLogin">已有账号？点击登录</a>
+      <div class="bottom">
+        <a @click="tabLogin">忘记密码</a>
+        <a @click="tabLogin">已有账号？点击登录</a>
+      </div>
     </div>
   </div>
 </template>
@@ -90,6 +96,12 @@ const tabLogin = () => {
     // 切换登录/注册
     isLogin.value = !isLogin.value;
 };
+
+/* 忘记密码 */
+const forget = () => {
+  /* 跳转到忘记密码页面 */
+  router.push('/forget') ;
+}
 /* 登录 */
 const login = () => {
   myAxios({
@@ -105,6 +117,7 @@ const login = () => {
         sessionStorage.setItem("user", JSON.stringify(user));
         // 初始化store
         userStore.commit('initUser',user);
+        
         
         // 提示登录成功
         ElMessage({
@@ -177,6 +190,7 @@ const sign = () => {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+    transition: all .2s;
 
     input,
     button {
@@ -192,6 +206,13 @@ const sign = () => {
     input {
       text-indent: 1vw;
       color: white;
+    }
+
+    .bottom{
+      width:90%;
+      height: 10%;
+      display: flex;
+      justify-content: space-between;
     }
 
     a {

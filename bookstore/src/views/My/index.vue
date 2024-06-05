@@ -10,7 +10,7 @@
                <span class="tag">{{ user.role?'用户':'管理员' }}</span>
            </div>
             <!-- 退出登录 -->
-            <el-button type="primary">切换账号</el-button>
+            <el-button type="primary" @click="myRouter.push('/forget')">切换账号</el-button>
             <el-button type="primary" @click="esc">退出当前账号</el-button>
         </div>
         <div class="my_right"></div>

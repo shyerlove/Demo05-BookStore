@@ -14,6 +14,11 @@ export default createRouter({
             component: () => import('../views/Login/index.vue')
         },
         {
+            name: 'forget',
+            path: '/forget',
+            component: () => import('../views/Forget/index.vue')
+        },
+        {
             name: 'show',
             path: '/show',
             component: () => import('../views/Show/index.vue'),

@@ -19,6 +19,7 @@
     import Divider from '../../components/Divider/index.vue'
     import { reactive } from 'vue'
     import myAxios from '@/use/myAxios';
+    import { useStore } from 'vuex';
     // 页面数据
     const dataList = reactive({
         top:[],

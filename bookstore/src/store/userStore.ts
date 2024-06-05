@@ -6,7 +6,7 @@ import { createStore } from 'vuex'
 export default createStore({
     state() {
         return {
-            user: null
+            user: JSON.parse(sessionStorage.getItem('user') as string)
         }
     },
     mutations: {
