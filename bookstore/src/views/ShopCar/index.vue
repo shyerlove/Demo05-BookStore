@@ -31,8 +31,16 @@
             <span>￥{{ allPrice }}</span>
             <span>
                 已选择{{ count }}本书籍
-                <el-icon color="#2d2d2f"><ArrowUpBold /></el-icon>
+                <el-icon color="#2d2d2f" @click="rotate" class="icon"><ArrowUpBold  /></el-icon>
             </span>
+            <el-card class="win" v-show="isOpenWin">
+                <ul>
+                    <li v-for="(item,index) in obj.list " :key="index" class="win_li">
+                        <strong>{{ item.book_name }}</strong>
+                        <span>数量：{{ item.book_count }}</span>
+                    </li>
+                </ul>
+            </el-card>
        </div>
     </div>
 </template>
@@ -44,6 +52,7 @@ import {useStore} from 'vuex'
 import {ElMessage} from 'element-plus'
 import myAxios from '@/use/myAxios';
 import fenlei from '@/utils/shopcar.js'
+
 // 获取用户基本数据
 const userStore = useStore();
 const {user} = userStore.state;
@@ -60,12 +69,25 @@ type shopCard = {
     isSelect: boolean
 }
 /* 初始化数据 */
-const obj = reactive({
-    showcarData: []
+const obj = reactive<any>({
+    showcarData: [],
+    list: []
 })
 const show = async () => {
     obj.showcarData = fenlei((await myAxios.post('/webapi/shopCar',{id:user.id})).data.data); 
 }
+watch(()=>obj.showcarData,(newVal)=>{
+    const temList:shopCard[] = [] ;
+    (newVal as shopCard[][]).forEach(i=>{
+         i.forEach(j=>{
+            if(j.isSelect){
+                temList.push(j);
+            }
+        })
+    }) ;
+    obj.list = temList; 
+    
+},{deep:true});
 /* 初始化数据 */
 show();
 /* 计算购买的数量 */
@@ -118,15 +140,15 @@ const all = () => {
 
 /* 支付 */
 const buy = () => {
-     // 获取删除的id集合
-     let books:Array<Array<number>> = [];
-    obj.showcarData.forEach((v)=>{
-        (v as shopCard[]).forEach(l=>{
+    // 获取删除的id集合
+    let books:Array<Array<number>> = [] ;
+    obj.showcarData.forEach((v:shopCard[]) => {
+        v.forEach((l)=>{
             if(l.isSelect){
                 books.push([l.book_id,l.book_count]);
             }
         })
-    })
+    }) ;
     myAxios({
         method:'POST',
         url:'/webapi/buyBook',
@@ -152,7 +174,7 @@ const buy = () => {
 const dels = () => {
     // 获取删除的id集合
     let ids:number[] = [];
-    obj.showcarData.forEach((v)=>{
+    obj.showcarData.forEach((v:shopCard[])=>{
         (v as shopCard[]).forEach(l=>{
             if(l.isSelect){
                 ids.push(l.book_id);
@@ -179,6 +201,19 @@ const dels = () => {
         });
         console.log(err);
     });
+}
+let isRotate = ref(false);
+let isOpenWin = ref(false);
+const rotate = (e:Event) => {
+    isRotate.value =!isRotate.value ;
+    if(isRotate.value){
+        (e.target as HTMLElement).style.transition = 'all 0.2s';  
+        (e.target as HTMLElement).style.transform = 'rotate(-180deg)';  
+        isOpenWin.value = true;
+    }else{
+        (e.target as HTMLElement).style.transform = 'rotate(0)';  
+        isOpenWin.value = false;
+    }
 }
 </script>
 
@@ -249,6 +284,49 @@ const dels = () => {
                 color:black;
                 line-height: 10vh;
                 margin-right: 2vw;
+            }
+            .icon{
+                &:hover{
+                    cursor: pointer;
+                }
+
+            }
+            .win{
+                position: fixed;
+                width:20vw;
+                height: 40vh;
+                border-radius: 5px;
+                right:15vw;
+                bottom:8vh;
+                transition: all 0.2s;
+                overflow-y: auto;
+                &::-webkit-scrollbar{
+                    display: none;
+                }
+
+                .win_li{
+                    width: 100%;
+                    height: 10vh;
+                    line-height: 10vh;
+                    text-align: center;
+                    background-color: white;
+                    color: $blue;
+                    border-bottom: 1px solid #a0cfff;
+                    transition: all 0.2s;
+                    span{
+                        transition: all 0.2s;
+                        color: $blue;
+                    }
+                    &:hover{
+                        cursor: pointer;
+                        border-radius: 10px;
+                        background-color: #a0cfff;
+                        color: white;
+                        span{
+                            color:white;
+                        }
+                    }
+                }
             }
         }
     }
