@@ -17,6 +17,7 @@ const updateBookController = require('../controllers/updateBookController');
 const addBookController = require('../controllers/addBookController');
 const delsShopcarController = require('../controllers/delsShopcarController');
 const forgetController = require('../controllers/forgetController');
+const ordersController = require('../controllers/ordersController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -53,6 +54,8 @@ router.post('/updateBook', upload.any(), updateBookController);
 router.post('/delsShopcar', delsShopcarController);
 // 找回密码
 router.post('/forget', forgetController);
+// 获取用户订单
+router.get('/orders', ordersController);
 
 
 /* 导出路由 */

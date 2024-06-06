@@ -23,11 +23,15 @@
                 :show = "show"
                 :del = "dels"
            />
+           <h1 v-if="obj.showcarData.length == 0" class="noOrder">
+                <img src="/src/assets/svg/konggouwuche.svg">
+                购物车空空如也...
+            </h1>
        </div>
        </div>
        <div class="bill">
             <button :class="count?'delBtn active':'delBtn'" @click="dels">删除选择项</button>
-            <button :class="count?'closeBtn active':'closeBtn'" @click="buy">去结算</button>
+            <button :class="count?'closeBtn active':'closeBtn'" @click="openPayWin">去结算</button>
             <span>￥{{ allPrice }}</span>
             <span>
                 已选择{{ count }}本书籍
@@ -42,21 +46,59 @@
                 </ul>
             </el-card>
        </div>
+
+       
+    </div>
+    <div class="pay" v-show="isPay">
+        <!-- 支付框 -->
+       <div class="pay_win">
+            <div class="pay_list">
+                <div class="pay_item" v-for="(item,index) in obj.list " :key="index">
+                    <h1>{{item.store_name}}</h1>
+                    <div class="content">
+                        <div class="left">
+                            <img :src="'http://127.0.0.1:3002/img?i='+item.book_imgUrl" alt="加载中...">
+                        </div>
+                        <div class="right">
+                            <h1>{{ item.book_name }}</h1>
+                            <p>{{ item.book_name }}</p>
+                            <span>
+                                <span class="msg">包邮</span>
+                                <span class="count">× {{ item.book_count }}</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <el-radio-group v-model="payMode" class="pay_mode">
+                <el-radio :value="1" size="large" border ><img src="/src/assets/svg/weixinpay.svg" class="pay_icon"/>微信支付</el-radio>
+                <el-radio :value="2" size="large" border ><img src="/src/assets/svg/zhifubaopay.svg" class="pay_icon"/>支付宝支付</el-radio>
+                <el-radio :value="3" size="large" border ><img src="/src/assets/svg/yinhangkapay.svg" class="pay_icon"/>银行卡支付</el-radio>
+            </el-radio-group>
+            <div class="btns">
+                <strong>￥ {{ allPrice }}</strong>
+                <el-button type="primary" style="height: 6vh;" @click="isPay=false">我在想想</el-button>
+                <el-button type="danger" style="height: 6vh;" @click="buy" >确认支付</el-button>
+            </div>
+       </div>
     </div>
 </template>
 
 <script setup name="shopcar" lang="ts">
 import Shopcard from '../../components/Shopcard/index.vue'
-import {computed,reactive,ref,watch} from 'vue'
-import {useStore} from 'vuex'
-import {ElMessage} from 'element-plus'
+import { computed, reactive, ref, watch } from 'vue'
+import { useStore } from 'vuex'
+import { ElMessage, ElLoading } from 'element-plus'
 import myAxios from '@/use/myAxios';
 import fenlei from '@/utils/shopcar.js'
 
 // 获取用户基本数据
 const userStore = useStore();
 const {user} = userStore.state;
-
+// 是否支付
+let isPay = ref<boolean>(false) ;
+// 支付方式 1:微信 2：支付宝 3：银行卡
+let payMode = ref<1|2|3>(1) ;
 type shopCard = {
     book_id: number,
     book_name: string,
@@ -73,6 +115,17 @@ const obj = reactive<any>({
     showcarData: [],
     list: []
 })
+let openPayWin = () => {
+    if(obj.list.length > 0) {
+        isPay.value = true ;
+    }else{
+        ElMessage({
+            message: '请选择需要支付的商品',
+            type: 'warning',
+        })
+    }
+};
+
 const show = async () => {
     obj.showcarData = fenlei((await myAxios.post('/webapi/shopCar',{id:user.id})).data.data); 
 }
@@ -140,12 +193,12 @@ const all = () => {
 
 /* 支付 */
 const buy = () => {
-    // 获取删除的id集合
-    let books:Array<Array<number>> = [] ;
+    // 获取商品的id及数量集合
+    let books:any = [] ;
     obj.showcarData.forEach((v:shopCard[]) => {
         v.forEach((l)=>{
             if(l.isSelect){
-                books.push([l.book_id,l.book_count]);
+                books.push(l);
             }
         })
     }) ;
@@ -157,11 +210,23 @@ const buy = () => {
             books
         },
     }).then( res =>{
-        ElMessage({
-            message:'支付成功！',
-            type:'success'
+        const loading = ElLoading.service({
+            lock: true,
+            text: '加载中...',
+            background: 'rgba(0, 0, 0, 0.7)'
         });
-        show();
+        setTimeout(() => {
+            loading.close();
+            // 重新渲染数据
+            show();
+            // 提示支付成功
+            ElMessage({
+                message:'支付成功！',
+                type:'success'
+            });
+            // 关闭支付窗口
+            isPay.value = false ;
+        }, 2000)
     }).catch( err => {
         ElMessage({
             message:'支付失败！',
@@ -248,6 +313,18 @@ const rotate = (e:Event) => {
             height: 70vh;
             margin:0 auto ;
             overflow-y: scroll;
+            .noOrder{
+                width:100%;
+                font-weight: 400;
+                display: flex;
+                justify-content: center;
+                font-size: 26px;
+                line-height: 60vh;
+                img{
+                    width:50px;
+                    margin-right: 1vw;
+                }
+            }
         }
         ::-webkit-scrollbar{
             display: none;
@@ -326,6 +403,127 @@ const rotate = (e:Event) => {
                             color:white;
                         }
                     }
+                }
+            }
+        }
+        
+    }
+
+    .pay{
+        width:100vw;
+        height: 100vh;
+        background-color: rgba(128, 128, 128, 0.3);
+        position: fixed;
+        top:0;
+        z-index: 999;
+        // 支付窗口
+        .pay_win{
+            width:70vw;
+            height: 80vh;
+            position: absolute;
+            top: 10vh;
+            left: 15vw;
+            z-index: 999;
+            background-color: white;
+            box-shadow: 0 0 10px #c6e2ff;
+            border-radius: 5px;
+
+            .pay_list{
+                width:100%;
+                height: 70%;
+                padding:0 1vw;
+                overflow-y: auto;
+                &::-webkit-scrollbar{display: none;}
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                .pay_item{
+                    width:90%;
+                    min-height: 30%;
+                    background-color: #d9ecff;
+                    margin-top: 2vh;
+                    border-radius: 5px;
+                    &>h1{
+                       width:100%;
+                       height: 30%;
+                       font-size: 18px; 
+                       background-color: $blue;
+                       border-top-left-radius: 5px;
+                       border-top-right-radius: 5px;
+                       text-indent: 1vw;
+                       color:white;
+                    }
+                    .content{
+                        width:100%;
+                        height: 70%;
+                        display: flex;
+                        align-items: center;
+                        .left{
+                            width:20%;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            img{
+                                width:40%;
+                                height: 90%;
+                                border:1px solid $blueplus;
+                            }
+                        }
+                        .right{
+                            width:70%;
+                            height: 100%;
+                            h1{
+                                font-size: 20px;
+                            }
+                            p{
+                                overflow: hidden;
+                                text-wrap: nowrap;
+                                text-overflow: ellipsis;
+                            }
+                            span{
+                                width:100%;
+                                display: flex;
+                                justify-content: space-between;
+                                padding-right:1vw;
+                                span{
+                                    width:fit-content
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .pay_mode{
+                width:100%;
+                height: 10vh;
+                position: absolute;
+                bottom:10vh;
+                display: flex;
+                justify-content: center;
+                span.el-radio__label {
+                    display: flex;
+                    .pay_icon{
+                        width:20px;
+                        margin-right: 5px;
+                    }
+                }
+            }
+            .btns{
+                width:100%;
+                height: 10vh;
+                position: absolute;
+                bottom:0;
+                display: flex;
+                align-items: center;
+                justify-content: end;
+                strong{
+                    margin-right: 5vw;
+                    font-size: 24px;
+                    font-weight: 400;
+                }
+                button{
+                    margin-right: 1vw;
                 }
             }
         }

@@ -125,7 +125,12 @@ const login = () => {
           type: "success",
         });
         //判断用户是管理员还是用户
-        user.role === 0 ? router.push("/man") : router.push("/show");
+        if(user.role === 0 ){
+          router.push("/man") ;
+        }else{
+          router.push("/show");
+          userStore.dispatch('initOrder');
+        } 
       } else {
         ElMessage({
           message: "账号或密码错误!",

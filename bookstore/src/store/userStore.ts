@@ -1,4 +1,4 @@
-
+import myAxios from '@/use/myAxios';
 import { createStore } from 'vuex'
 
 
@@ -6,7 +6,8 @@ import { createStore } from 'vuex'
 export default createStore({
     state() {
         return {
-            user: JSON.parse(sessionStorage.getItem('user') as string)
+            user: JSON.parse(sessionStorage.getItem('user') as string),
+            order: []
         }
     },
     mutations: {
@@ -15,6 +16,21 @@ export default createStore({
         },
         clearUser(state) {
             state.user = null;
+        },
+        initOrder(state, payload) {
+            state.order = payload;
+        }
+    },
+    actions: {
+        async initOrder(context) {
+            const { data } = await myAxios({
+                url: '/webapi/orders',
+                method: 'get',
+                params: {
+                    user_id: context.state.user.id
+                }
+            })
+            context.commit('initOrder', data.data);
         }
     }
 });

@@ -3,7 +3,6 @@ const query = require('../db');
 const shopcarController = (req, res) => {
     /* 获取id */
     let { id } = req.body;
-    console.log(id);
     /* 查询数据库，获取购物车数据 */
     let sql = `select * from books.bookdata,books.shopcar where books.bookdata.book_id = books.shopcar.book_id and books.shopcar.user_id = ?`;
     query(sql, [id], (err, data) => {
