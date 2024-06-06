@@ -86,7 +86,7 @@
 
 <script setup name="shopcar" lang="ts">
 import Shopcard from '../../components/Shopcard/index.vue'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, vShow, watch } from 'vue'
 import { useStore } from 'vuex'
 import { ElMessage, ElLoading } from 'element-plus'
 import myAxios from '@/use/myAxios';
@@ -237,15 +237,16 @@ const buy = () => {
    
 /* 批量删除 */
 const dels = () => {
+    if(obj.list.length === 0){
+        ElMessage({
+            message:'请选择需要删除的商品',
+            type:'warning'
+        });
+        return ;
+    }
     // 获取删除的id集合
     let ids:number[] = [];
-    obj.showcarData.forEach((v:shopCard[])=>{
-        (v as shopCard[]).forEach(l=>{
-            if(l.isSelect){
-                ids.push(l.book_id);
-            }
-        })
-    })
+    obj.list.forEach( ( v:shopCard ) => ids.push(v.book_id) ) ;
     myAxios({
         method:'POST',
         url:'/webapi/delsShopcar',
@@ -270,7 +271,8 @@ const dels = () => {
 let isRotate = ref(false);
 let isOpenWin = ref(false);
 const rotate = (e:Event) => {
-    isRotate.value =!isRotate.value ;
+    if(obj.list.length > 0){
+        isRotate.value =!isRotate.value ;
     if(isRotate.value){
         (e.target as HTMLElement).style.transition = 'all 0.2s';  
         (e.target as HTMLElement).style.transform = 'rotate(-180deg)';  
@@ -278,6 +280,7 @@ const rotate = (e:Event) => {
     }else{
         (e.target as HTMLElement).style.transform = 'rotate(0)';  
         isOpenWin.value = false;
+    }
     }
 }
 </script>
