@@ -170,12 +170,19 @@ const edit = (book:Book,isadd:boolean) => {
 }
 
 /* 更换图书图片 */
-const upload =  (e:Event) => {
+const upload =  (e:Event) => {    
+    /* 防止用户上传违规资源 */
+    if((e.target as HTMLFormElement).files[0].type.split('/')[0] !== 'image'){
+        ElMessage({
+            message: '请上传图片文件',
+            type: 'error',
+        })
+        return ;
+    }
     const reader = new FileReader();
     reader.readAsDataURL((e.target as HTMLFormElement).files[0]);
-    reader.onload = async (event) => {
+    reader.onload =  (event) => {
         file.value = src.value = (event.target?.result as string) ;
-
     }
 }
 /* 添加图书 */

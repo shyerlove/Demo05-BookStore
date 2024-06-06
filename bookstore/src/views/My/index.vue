@@ -17,7 +17,7 @@
                 <el-button type="primary" @click="esc">退出当前账号</el-button>
             </div>
         </div>
-        <div class="my_right">
+        <div class="my_right" v-if="userStore.state.user.role==1">
             <div class="my_order">
                 <template v-for="item in userStore.state.order" :key="item.book_id">
                     <Order :data="item"/>
@@ -36,6 +36,7 @@
     import { useStore } from 'vuex' ;
     import Order from '@/components/Order/index.vue' ;
     import { onMounted } from 'vue';
+import { ElMessage } from 'element-plus';
     const userStore = useStore();
     const {user} = userStore.state;
     const myRouter = useRouter() ;
@@ -48,6 +49,10 @@
         sessionStorage.removeItem('user') ;
         userStore.commit('clearUser') ;
         myRouter.replace('/login');
+        ElMessage({
+            message: '退出成功',
+            type:'success'
+        })
     }
 </script>
 

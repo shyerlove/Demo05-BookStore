@@ -6,6 +6,7 @@ import { createStore } from 'vuex'
 export default createStore({
     state() {
         return {
+            menus: [],
             user: JSON.parse(sessionStorage.getItem('user') as string),
             order: []
         }
@@ -19,9 +20,13 @@ export default createStore({
         },
         initOrder(state, payload) {
             state.order = payload;
+        },
+        initMenus(state, payload) {
+            state.menus = payload;
         }
     },
     actions: {
+        /* 加载订单数据 */
         async initOrder(context) {
             const { data } = await myAxios({
                 url: '/webapi/orders',
@@ -31,6 +36,15 @@ export default createStore({
                 }
             })
             context.commit('initOrder', data.data);
+        },
+        /* 加载菜单数据 */
+        async initMenus(context) {
+            const { data } = await myAxios({
+                url: '/webapi/menus',
+                method: 'get',
+                params: { role: context.state.user.role }
+            })
+            context.commit('initMenus', data.data);
         }
     }
 });

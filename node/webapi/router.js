@@ -18,6 +18,7 @@ const addBookController = require('../controllers/addBookController');
 const delsShopcarController = require('../controllers/delsShopcarController');
 const forgetController = require('../controllers/forgetController');
 const ordersController = require('../controllers/ordersController');
+const getMenusController = require('../controllers/getMenusController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -56,6 +57,8 @@ router.post('/delsShopcar', delsShopcarController);
 router.post('/forget', forgetController);
 // 获取用户订单
 router.get('/orders', ordersController);
+// 获取路由菜单
+router.get('/menus', getMenusController);
 
 
 /* 导出路由 */

@@ -63,6 +63,12 @@ export default createRouter({
                     path: 'manage',
                     component: () => import('../views/Manage/index.vue'),
                     beforeEnter: grard.manage
+                },
+                {
+                    name: 'manuser',
+                    path: 'manuser',
+                    component: () => import('../views/Manuser/index.vue'),
+                    beforeEnter: grard.manage
                 }
             ]
         }
