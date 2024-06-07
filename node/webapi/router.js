@@ -19,6 +19,8 @@ const delsShopcarController = require('../controllers/delsShopcarController');
 const forgetController = require('../controllers/forgetController');
 const ordersController = require('../controllers/ordersController');
 const getMenusController = require('../controllers/getMenusController');
+const usersController = require('../controllers/usersController');
+const blackListController = require('../controllers/blackListController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -59,6 +61,10 @@ router.post('/forget', forgetController);
 router.get('/orders', ordersController);
 // 获取路由菜单
 router.get('/menus', getMenusController);
+// 获取全部用户信息
+router.get('/users', usersController);
+// 加入/移除 黑名单
+router.get('/blackList', blackListController);
 
 
 /* 导出路由 */
