@@ -71,6 +71,11 @@ export default createRouter({
                     beforeEnter: grard.manage
                 }
             ]
+        },
+        {
+            name: 'notfound',
+            path: '/notfound',
+            component: () => import('../views/404/index.vue')
         }
 
     ]

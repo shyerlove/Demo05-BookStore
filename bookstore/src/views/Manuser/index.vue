@@ -150,6 +150,7 @@ const addBlackList = (item: user) => {
     ElMessageBox.prompt('请输入你的账号密码', '提示', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
+        inputType:'password',
         inputPattern: /^[a-zA-Z0-9]+$/,
         inputErrorMessage: '请输入登录密码',
     })
