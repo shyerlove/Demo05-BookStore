@@ -1,10 +1,10 @@
 const query = require('../db');
 
 const signController = (req, res) => {
-    const { phone, username, password, identity } = req.query;
+    const { realname, phone, username, sex, site, password, identity } = req.body;
     /* 查询数据库，获取购物车数据 */
-    let sql = 'insert into users(user_phone,user_name,user_password,user_identity) values(?,?,?,?)';
-    query(sql, [phone, username, password, Number(identity)], (err, data) => {
+    let sql = 'insert into users(realname,sex,user_phone,user_name,site,user_password,user_identity) values(?,?,?,?,?,?,?)';
+    query(sql, [realname, sex, phone, username, site, password, Number(identity)], (err, data) => {
         if (err) {
             return res.json({
                 code: 500,

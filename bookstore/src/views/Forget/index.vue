@@ -11,7 +11,7 @@
             v-show="!isRemember"
         >
             <el-form-item label="姓名" prop="name" >
-                <el-input v-model="form.name"  />
+                <el-input v-model="form.name"/>
             </el-form-item>
             <el-form-item label="用户名"  prop="userName">
                 <el-input v-model="form.userName" />
@@ -26,7 +26,7 @@
                 <el-input v-model="form.phone"  />
             </el-form-item>
             <el-button type="primary" @click="submitForm(forgetFormRef)">确认修改</el-button>
-            <el-button type="warning" style="margin-right: 10px;" @click="backLogin">取消</el-button>
+            <el-button type="warning" style="margin-right: 10px;" @click="backLogin">返回登录</el-button>
         </el-form>
         <div class="title" v-show="isRemember">
             <h1>{{h1.s}}秒后跳转至登录页{{ h1.str }}</h1>
@@ -42,21 +42,13 @@ import { ElMessage } from 'element-plus';
 import { onMounted, reactive,ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {useStore} from 'vuex'
+// 路由实例
 const router = useRouter();
+// store
 const store = useStore();
-onMounted(() => {
-    if(store.state.user){
-        form.userName = store.state.user.username ;
-        form.phone = store.state.user.phone ;
-    }
-})
-const isRemember = ref<boolean>(false);
-const h1 = reactive({
-    s:10,
-    str:'',
-});
-
+// 表单dom
 const forgetFormRef = ref() ;
+// 表单数据
 const form = reactive({
     name:'',
     userName:'',
@@ -64,6 +56,23 @@ const form = reactive({
     password2:'',
     phone:'',
 })
+onMounted(() => {    
+    // 判断用户是否登录状态，初始化当前用户数据
+    if(store.state.user){
+        form.userName = store.state.user.username ;
+        form.phone = store.state.user.phone ;
+        form.name = store.state.user.realname;
+    }
+})
+// 是否注册成功
+const isRemember = ref<boolean>(false);
+// 注册成功后的提示信息
+const h1 = reactive({
+    s:10,
+    str:'',
+});
+
+// 表单验证
 const sameRule = (rule:any,value:String,callback:Function) => {
     if(form.password1 === value){
         callback() ;
@@ -128,11 +137,13 @@ const submitForm = (forgetFormRef:any) => {
         }
   })
 }
-
+// 注册成功跳转函数
 const backLogin = () => {
     store.state.user ? router.push('/show/my') : router.push('/login') ;
 }
+// 定时器
 let Interval: NodeJS.Timeout;
+// 定义n秒后跳转
 watch(isRemember,(newVal)=>{
     if(newVal){
         Interval = setInterval(()=>{
@@ -149,6 +160,7 @@ watch(isRemember,(newVal)=>{
         },1000) ;
     }
 })
+// 直接跳转至登录页
 const goLogin = () => {
     clearInterval(Interval) ;
     router.push('/login') ;

@@ -38,6 +38,7 @@
                 :model="state.formData"
                 label-width="100px"
                 class="demo-ruleForm"
+                :rules="rule"
             >
                 <el-form-item label="书名" prop="book_name">
                     <el-input
@@ -82,7 +83,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="dialogTableVisible=false">取消</el-button>
-                    <el-button type="primary" @click="confirm">{{ isAdd?'添加':'确认修改' }}</el-button>
+                    <el-button type="primary" @click="confirm(formRef)">{{ isAdd?'添加':'确认修改' }}</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
@@ -99,7 +100,7 @@
 <script setup name="manage" lang="ts">
 import myAxios from "@/use/myAxios";
 import { reactive,ref } from "vue";
-import { ElMessage} from 'element-plus'
+import { ElMessage, FormInstance} from 'element-plus'
 import type Book from '@/types/book';
 import toBuffer from "@/utils/urlToBuffer";
 import hash from '@/utils/hash';
@@ -107,6 +108,34 @@ type state = {
     temPage:Array<Book>|[],
     formData:Book|{}
 }
+
+// 表单验证规则
+const rule = {
+    book_name: [
+        { required: true, message: '请输入书名', trigger: 'blur' },
+        { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+    ],
+    book_press: [
+        { required: true, message: '请输入出版社', trigger: 'blur' },
+        { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+    ],
+    store_name: [
+        { required: true, message: '请输入商家', trigger: 'blur' },
+        { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+    ],
+    book_imgUrl:[
+        {required: true, message: '图片不能为空', trigger: 'blur' },
+    ],
+    book_inventory:[
+        {required: true, min:100,message:'库存不能小于100', trigger:'blur' },
+    ],
+    book_cost:[
+        { required: true, message: '成本价不能为空',trigger:'blur' },
+    ],
+    book_price:[
+        { required: true, message: '定价不能为空',trigger:'blur' },
+    ],
+} ;
 
 // 当前页数
 let nowPage = ref<number>(1); 
@@ -119,6 +148,8 @@ const state = reactive<state>({
     temPage:[], // 每一页的数据
     formData:{} // 对话框中的临时数据
 }) ;
+// 表单dom
+const formRef = ref();
 // 声明弹窗状态
 const dialogTableVisible = ref<boolean>(false);
 // 新增：true 修改：false
@@ -200,8 +231,10 @@ const add = () => {
     edit(state.formData as Book,true);
 }
 /* 确认修改 */
-const confirm = async () => {
-    // 创建formdata对象
+const confirm = async (formDOM:FormInstance) => {
+    await formDOM.validate(async (valid:any) => {
+    if (valid) {
+       // 创建formdata对象
     const formdata = new FormData();
     // 获取
     let blob = await toBuffer(file.value) ;
@@ -247,6 +280,10 @@ const confirm = async () => {
             console.error(err);
         })  
     }
+    } else {
+      return ;
+    }
+  })
 }
 
 const look = (book:Book) => {

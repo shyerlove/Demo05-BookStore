@@ -21,6 +21,7 @@ const ordersController = require('../controllers/ordersController');
 const getMenusController = require('../controllers/getMenusController');
 const usersController = require('../controllers/usersController');
 const blackListController = require('../controllers/blackListController');
+const adminController = require('../controllers/adminController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -65,6 +66,8 @@ router.get('/menus', getMenusController);
 router.get('/users', usersController);
 // 加入/移除 黑名单
 router.get('/blackList', blackListController);
+// 删除管理员
+router.get('/admin', adminController);
 
 
 /* 导出路由 */

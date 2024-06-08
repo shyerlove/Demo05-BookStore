@@ -21,7 +21,9 @@ const loginController = (req, res) => {
             msg: '登录成功',
             data: {
                 id: data[0].user_id,
+                realname: data[0].realname,
                 username: data[0].user_name,
+                phone: data[0].user_phone,
                 role: data[0].user_identity,
                 token
             }
