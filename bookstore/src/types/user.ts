@@ -1,5 +1,5 @@
 type user = {
-    id: string,
+    id: number,
     name: string,
     username: string,
     role: '管理员' | '用户',

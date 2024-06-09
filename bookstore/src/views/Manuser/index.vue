@@ -1,15 +1,24 @@
 <template>
     <div class="manuser">
         <div class="search">
-            <el-input v-model="search" size="small" class="search_inp" placeholder="请输入关键字..."
-                @keyup.enter="HandleSearch" />
+            <!-- 搜索框 -->
+            <el-input 
+                v-model="search"
+                size="small" 
+                class="search_inp" 
+                placeholder="请输入关键字..."
+                @keyup.enter="HandleSearch" 
+            />
+            <!-- 搜索按钮 -->
             <el-button type="primary" class="search_btn" @click="HandleSearch">搜索</el-button>
+            <!-- 条件搜索 -->
             <el-radio-group v-model="radio1" size="small" class="search_radio">
                 <el-radio-button label="全部" @keyup.enter="HandleSearch" />
                 <el-radio-button label="仅管理员" @keyup.enter="HandleSearch" />
                 <el-radio-button label="仅用户" @keyup.enter="HandleSearch" />
             </el-radio-group>
         </div>
+        <!-- 表格 -->
         <el-table 
             :data="obj.filterData" 
             empty-text="暂无数据..."
@@ -61,7 +70,10 @@
             <el-table-column label="用户名" prop="username" />
             <el-table-column label="身份">
                 <template #default="props">
-                    <el-tag :type="props.row.role === '用户' && !props.row.isBlack  ? 'danger' : 'success'">
+                    <el-tag v-if="props.row.role === '用户'" :type="!props.row.isBlack  ? 'danger' : 'success'">
+                        {{ props.row.role }}
+                    </el-tag>
+                    <el-tag v-if="props.row.role === '管理员'" type="primary">
                         {{ props.row.role }}
                     </el-tag>
                 </template>
@@ -103,6 +115,7 @@ const rowStyle = ({row}:{row:user}) => {
 
 const search = ref<string>('');
 onMounted(() => {
+    // 初始化数据
     main();
 })
 
@@ -118,7 +131,8 @@ const HandleSearch = () => {
             obj.filterData = obj.userData.filter(data => {
                 return (
                     !search.value
-                    || data.name.toLowerCase().includes(search.value.toLowerCase())
+                    || data.username.toLowerCase().includes(search.value.toLowerCase())
+                    || data.id === +search.value
                 );
             });
             break;
@@ -127,7 +141,11 @@ const HandleSearch = () => {
                 if (!search.value) {
                     return data.role === '管理员'
                 } else {
-                    return data.name.toLowerCase().includes(search.value.toLowerCase()) && data.role === '管理员';
+                    return (
+                        data.username.toLowerCase().includes(search.value.toLowerCase()) && data.role === '管理员'
+                        || data.id === +search.value && data.role === '管理员'
+                    )
+                    ;
                 }
             });
             break;
@@ -136,7 +154,10 @@ const HandleSearch = () => {
                 if (!search.value) {
                     return data.role === '用户'
                 } else {
-                    return data.name.toLowerCase().includes(search.value.toLowerCase()) && data.role === '用户';
+                    return (
+                        data.username.toLowerCase().includes(search.value.toLowerCase()) && data.role === '用户'
+                        || data.id === +search.value && data.role === '用户'
+                    );
                 }
             });
             break;

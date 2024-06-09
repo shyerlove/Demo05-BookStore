@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="bottom">
-                <!-- 退出登录 -->
+                <el-button type="primary" @click="edit">编辑个人信息</el-button>
                 <el-button type="primary" @click="myRouter.push('/forget')">修改密码</el-button>
                 <el-button type="primary" @click="esc">退出当前账号</el-button>
             </div>
@@ -133,7 +133,7 @@ const esc = () => {
 
         .bottom {
             width: 30vw;
-            height: 20vh;
+            height: 25vh;
             display: flex;
             flex-direction: column;
             align-items: center;
