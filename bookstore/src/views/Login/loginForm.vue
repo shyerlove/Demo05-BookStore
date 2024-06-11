@@ -52,8 +52,9 @@
         </el-form-item>
         <el-form-item prop="identity" class="form_item">
           <el-radio-group v-model="signForm.identity" class="ml-4" style="position: absolute;right:0">
-            <el-radio-button :value="1" style="color:white;">普通用户</el-radio-button>
+            <el-radio-button :value="1" style="color:white;">用户</el-radio-button>
             <el-radio-button :value="0" style="color:white;">管理员</el-radio-button>
+            <el-radio-button :value="2" style="color:white;">商家</el-radio-button>
           </el-radio-group>
         </el-form-item>
       </div>
@@ -193,9 +194,11 @@ const login = async (loginDOM:FormInstance) => {
         //判断用户是管理员还是用户
         if (user.role === 0) {
           router.push("/man");
-        } else {
+        } else if(user.role === 1) {
           router.push("/show");
           userStore.dispatch('initOrder');
+        }else{
+          router.push("/merchant");
         }
       } else {
         ElMessage({
@@ -299,8 +302,12 @@ const sign = async (signDOM:FormInstance) => {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      .form_item{
-        width:50%;
+      .form_item:nth-child(1){
+        width:40%;
+        height: 100%;
+      }
+      .form_item:nth-child(2){
+        width:60%;
         height: 100%;
       }
     }

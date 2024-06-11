@@ -3,7 +3,6 @@ const JWT = require('../utils/jwt');
 
 const loginController = (req, res) => {
     const { username, password } = req.query;
-    /* 查询数据库，获取购物车数据 */
     let sql = `select * from users where user_name = ? and user_password = ?`;
     query(sql, [username, password], (err, data) => {
         if (err || !data.length) {

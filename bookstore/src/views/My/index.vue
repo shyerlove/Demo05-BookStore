@@ -8,7 +8,9 @@
                 </div>
                 <div class="msg">
                     <h2 class="user_name">{{ user.username }}</h2>
-                    <span class="tag">{{ user.role ? '用户' : '管理员' }}</span>
+                    <span class="tag">
+                        {{ user.role === 0 ? '管理员' : user.role === 1 ? '用户' : '商家' }}
+                    </span>
                 </div>
             </div>
             <div class="bottom">

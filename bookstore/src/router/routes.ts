@@ -73,6 +73,33 @@ export default createRouter({
             ]
         },
         {
+            name: 'merchant',
+            path: '/merchant',
+            component: () => import('../views/Show/index.vue'),
+            redirect: '/merchant/inventory',
+            meta: { requireAuth: true },
+            children: [
+                {
+                    name: 'inventory',
+                    path: 'inventory',
+                    component: () => import('../views/Inventory/index.vue'),
+                    beforeEnter: grard.merchant
+                },
+                {
+                    name: 'hall',
+                    path: 'hall',
+                    component: () => import('../views/Hall/index.vue'),
+                    beforeEnter: grard.merchant
+                },
+                {
+                    name: 'stock',
+                    path: 'stock',
+                    component: () => import('../views/Stock/index.vue'),
+                    beforeEnter: grard.merchant
+                },
+            ]
+        },
+        {
             name: 'notfound',
             path: '/notfound',
             component: () => import('../views/404/index.vue')

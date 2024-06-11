@@ -22,6 +22,7 @@ const getMenusController = require('../controllers/getMenusController');
 const usersController = require('../controllers/usersController');
 const blackListController = require('../controllers/blackListController');
 const adminController = require('../controllers/adminController');
+const inventoryController = require('../controllers/inventoryController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -34,6 +35,8 @@ router.post('/login', loginController);
 router.post('/addShopcar', addShopcarController);
 // 分页获取图书信息
 router.post('/books', booksController);
+// 获取全部图书信息
+router.get('/books', booksController);
 // 支付
 router.post('/buyBook', buyBookController);
 // 从购物车移除
@@ -68,6 +71,8 @@ router.get('/users', usersController);
 router.get('/blackList', blackListController);
 // 删除管理员
 router.get('/admin', adminController);
+// 获取商家库存
+router.get('/inventory', inventoryController);
 
 
 /* 导出路由 */
