@@ -3,14 +3,16 @@
         <el-row class="content">
             <el-col :span="4">
                 <h5 class="mb-2">分类</h5>
-                <el-menu
-                    :default-active="now_class"
-                    class="el-menu-vertical-demo"
-                >
-                    <el-menu-item v-for="(item,index) in book_class" :index="index" @click="tabClass(index)">
-                        <span>{{item}}</span>
-                    </el-menu-item>
-                </el-menu>
+                <ul class="menus">
+                    <li 
+                        v-for="(item,index) in book_class" 
+                        :index="index" 
+                        @click="tabClass(item.book_class,$event)"
+                        :class="nowClass === item.book_class ? 'active' : ''"
+                    >
+                        {{item.book_class}}({{ item.class_count }})
+                    </li>
+                </ul>
             </el-col>
             <el-col :span="20" class="list">
                 <div class="back">
@@ -30,7 +32,7 @@
                             <p class="book_cost"><strong>成本价: ￥</strong>{{ item.book_cost }}</p>
                         </div>
                         <div class="btn">
-                            <el-button type="primary" size="large" icon="ShoppingTrolley" style="font-size: 20px;">下单</el-button>
+                            <el-button type="warning" size="large" icon="ShoppingTrolley" style="font-size: 20px;">下单</el-button>
                         </div>
                     </div>
                     <el-divider v-if="index !== book.filterBook.length-1"/>
@@ -41,33 +43,46 @@
 </template>
 
 <script setup lang="ts" name="stock">
+import bookclass from '@/types/bookclass';
 import myAxios from '@/use/myAxios';
 import { onMounted, reactive, ref } from 'vue';
 
-
+// 图书数据
 const book = reactive({
     books:<any>[],
     filterBook:<any>[],
 });
-const book_class = [
-    '工具类',
-    '教育类',
-    '长篇小说',
-    '短篇小说',
-    '少儿类'
-] ;
+// 分类数据
+const book_class = reactive<Array<bookclass>>([]) ;
 // 当前类
-let now_class = ref<number>(0);
+let  nowClass = ref<string>('');
     
+/* 进行初始化操作 */
 onMounted(async () => {
-   const {data} = await myAxios.get('webapi/books');
-   book.books = data.data;
-   tabClass(0);
+    // 获取分类和数量
+    const result = await myAxios.get('webapi/bookclass');
+    Object.assign(book_class,result.data.data);
+    // 获取所有的书籍
+    const {data} = await myAxios.get('webapi/books');
+    book.books = data.data;
+    // 默认显示第一行数据
+    nowClass.value = book_class[0].book_class ; 
+    tabClass(book_class[0].book_class);
 })
-
-const tabClass = (index:any) => {
-    console.log(index);
-    book.filterBook = book.books.filter((item:any) => item.book_class === book_class[index]) ;
+    
+/* 分类展示 */
+const tabClass = (book_class:any,e?:Event) => {
+    // 激活点击样式
+    if(e){
+        const list = ((e.target as HTMLElement).parentNode as HTMLElement).children;
+        for (let i = 0; i < list.length; i++) {
+            console.log(i);
+            list[i].classList.remove('active');
+        }
+        (e.target as HTMLElement).classList.add('active');
+    }
+    // 重新获取分类数据
+    book.filterBook = book.books.filter((item:any) => item.book_class === book_class) ;
 }
 
 </script>
@@ -93,9 +108,40 @@ const tabClass = (index:any) => {
             line-height: 10vh;
             font-size: 20px;
             font-weight: 300;
+            background-color: $blueplus;
+            color:white;
         }
         p{
             font-size: 20px;
+        }
+
+        .menus{
+            height: 90vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: $blue;
+            &::-webkit-scrollbar{
+                display: none;
+            }
+
+            li{
+                width: 100%;
+                height: 14vh;
+                text-align: center;
+                line-height: 14vh;
+                color:white;
+                transition:all .3s;
+                &:hover{
+                    cursor: pointer;
+                    background-color: white;
+                    color:$blueplus;
+                }
+            }
+            .active{
+                background-color: white;
+                color:$blueplus;
+            }
         }
 
         .list{

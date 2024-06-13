@@ -3,7 +3,7 @@
        <table class="tb">
            <thead>
                 <tr class="tb_head">
-                    <th>编号</th><th>书名</th><th>出版社</th><th>库存</th><th>成本价</th><th>定价</th><th>操作</th>
+                    <th>编号</th><th>书名</th><th>出版社</th><th>库存</th><th>成本价</th><th>类别</th><th>操作</th>
                 </tr>
            </thead>
            <tbody>
@@ -13,7 +13,7 @@
                     <td>{{ b.book_press }}</td>
                     <td>{{ b.book_inventory }}</td>
                     <td>{{ b.book_cost }}</td>
-                    <td>{{ b.book_price }}</td>
+                    <td>{{ b.book_class }}</td>
                     <td>
                         <el-button type="primary" size="small" @click="edit(b,false)">编辑</el-button>
                         <el-button type="success" size="small" @click="look(b)">查看</el-button>
@@ -54,9 +54,9 @@
                         autocomplete="off"
                     />
                 </el-form-item>
-                <el-form-item label="商家" prop="store_name">
+                <el-form-item label="类别" prop="book_class">
                     <el-input
-                    v-model="(state.formData as Book).store_name"
+                    v-model="(state.formData as Book).book_class"
                         type="text"
                         autocomplete="off"
                     />
@@ -77,9 +77,6 @@
                 </el-form-item>
                 <el-form-item label="成本价" prop="book_cost">
                     <el-input-number v-model="(state.formData as Book).book_cost" :min="0" :max="1000"  />
-                </el-form-item>
-                <el-form-item label="定价" prop="book_price">
-                    <el-input-number v-model="(state.formData as Book).book_price" :min="0" :max="1000"  />
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="dialogTableVisible=false">取消</el-button>
@@ -117,23 +114,17 @@ const rule = {
     ],
     book_press: [
         { required: true, message: '请输入出版社', trigger: 'blur' },
-        { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
+        { min: 2, max: 12, message: '长度在 5 到 12 个字符', trigger: 'blur' }
     ],
-    store_name: [
-        { required: true, message: '请输入商家', trigger: 'blur' },
-        { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
-    ],
-    book_imgUrl:[
-        {required: true, message: '图片不能为空', trigger: 'blur' },
+    book_class: [
+        { required: true, message: '请输入类别', trigger: 'blur' },
+        { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
     ],
     book_inventory:[
-        {required: true, min:100,message:'库存不能小于100', trigger:'blur' },
+        {required: true,message:'库存不能小于100', trigger:'blur' },
     ],
     book_cost:[
-        { required: true, message: '成本价不能为空',trigger:'blur' },
-    ],
-    book_price:[
-        { required: true, message: '定价不能为空',trigger:'blur' },
+        { required: true, message: '成本价过高',trigger:'blur' },
     ],
 } ;
 
@@ -160,14 +151,14 @@ let src = ref<string>('');
 const file = ref<string>('');
 // 是否开启图片预览
 const imgDialog = ref<boolean>(false);
-
-// 获取总图书量
-myAxios.get('webapi/getAll').then(res=>{
-    total.value = res.data.data[0].count;
-})
     
 /* 渲染函数，向后端请求数据进行重渲染 */
 const show = () => {
+    // 获取总图书量
+    myAxios.get('webapi/getAll').then(res=>{
+        total.value = res.data.data[0].count;
+    })
+    // 获取单页图书
     myAxios({
         method:'POST',
         url:'webapi/books',
@@ -222,11 +213,10 @@ const add = () => {
         book_id:0,
         book_name:'',
         book_press:'',
-        store_name:'',
+        book_class:'',
         book_imgUrl:'',
         book_inventory:0,
         book_cost:0,
-        book_price:0,
     };
     edit(state.formData as Book,true);
 }
@@ -243,12 +233,10 @@ const confirm = async (formDOM:FormInstance) => {
     formdata.append('book_id',(state.formData as Book).book_id.toString());
     formdata.append('book_name',(state.formData as Book).book_name);
     formdata.append('book_press',(state.formData as Book).book_press);
-    formdata.append('store_name',(state.formData as Book).store_name);
+    formdata.append('book_class',(state.formData as Book).book_class);
     formdata.append('book_imgUrl',blob);
     formdata.append('book_inventory',(state.formData as Book).book_inventory.toString());
     formdata.append('book_cost',(state.formData as Book).book_cost.toString());
-    formdata.append('book_price',(state.formData as Book).book_price.toString());
-
     if(isAdd.value){        
         myAxios({
             method:'POST',

@@ -8,9 +8,8 @@ const addBookController = (req, res) => {
         book_name,
         book_press,
         book_cost,
-        book_price,
         book_inventory,
-        store_name
+        book_class
     } = req.body;
     const { buffer, mimetype } = req.files[0];
     // 获取文件后缀名
@@ -22,9 +21,9 @@ const addBookController = (req, res) => {
     // 保存图片在服务器中
     fs.writeFileSync(imgPath, buffer, 'base64');
     // 定义sql语句
-    const sql = 'call add_book(?,?,?,?,?,?,?)';
+    const sql = 'call add_book(?,?,?,?,?,?)';
     // 执行sql
-    query(sql, [book_name, book_press, imgName, Number(book_cost), Number(book_price), Number(book_inventory), store_name], (err, data) => {
+    query(sql, [book_name, book_press, imgName, Number(book_cost), Number(book_inventory), book_class], (err, data) => {
         if (err) {
             return res.json({
                 code: 501,

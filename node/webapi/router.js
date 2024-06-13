@@ -23,6 +23,7 @@ const usersController = require('../controllers/usersController');
 const blackListController = require('../controllers/blackListController');
 const adminController = require('../controllers/adminController');
 const inventoryController = require('../controllers/inventoryController');
+const getBookClassController = require('../controllers/getBookClassController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -73,6 +74,8 @@ router.get('/blackList', blackListController);
 router.get('/admin', adminController);
 // 获取商家库存
 router.get('/inventory', inventoryController);
+// 获取类别及数量
+router.get('/bookclass', getBookClassController);
 
 
 /* 导出路由 */
