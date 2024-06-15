@@ -32,7 +32,15 @@
                             <p class="book_cost"><strong>成本价: ￥</strong>{{ item.book_cost }}</p>
                         </div>
                         <div class="btn">
-                            <el-button type="warning" size="large" icon="ShoppingTrolley" style="font-size: 20px;">下单</el-button>
+                            <el-button 
+                                :type="item.stock_state == 1 ? 'success':'warning'" 
+                                size="large" 
+                                :icon="item.stock_state == 1 ? 'Check': 'ShoppingTrolley'" 
+                                style="font-size: 20px;"
+                                :disabled="item.stock_state == 1"
+                                @click="stockHandler(item)"
+
+                            >{{ item.stock_state == 1 ? '已下单' : '下单' }}</el-button>
                         </div>
                     </div>
                     <el-divider v-if="index !== book.filterBook.length-1"/>
@@ -43,15 +51,21 @@
 </template>
 
 <script setup lang="ts" name="stock">
+import Book from '@/types/book';
 import bookclass from '@/types/bookclass';
 import myAxios from '@/use/myAxios';
+import useSocket from '@/use/useSocket';
+import {ElMessage, ElMessageBox} from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
+import { useStore } from 'vuex';
+const store = useStore();
 
 // 图书数据
 const book = reactive({
-    books:<any>[],
-    filterBook:<any>[],
+    books:<Array<Book>>[],
+    filterBook:<Array<Book>>[],
 });
+
 // 分类数据
 const book_class = reactive<Array<bookclass>>([]) ;
 // 当前类
@@ -65,13 +79,26 @@ onMounted(async () => {
     // 获取所有的书籍
     const {data} = await myAxios.get('webapi/books');
     book.books = data.data;
+    // 获取订单状态
     // 默认显示第一行数据
     nowClass.value = book_class[0].book_class ; 
     tabClass(book_class[0].book_class);
 })
+
+const getOrderState = async () => {
+    // 获取订单状态
+    const orders = await myAxios.get('/webapi/stackorder',{params:{user_id:store.state.user.id}});
+    book.filterBook.map((item)=>{
+        orders.data.data.forEach((j:any)=>{
+            if(j.book_id === item.book_id){
+                item.stock_state = j.stock_state ;
+            }
+        }) 
+    })
+}
     
 /* 分类展示 */
-const tabClass = (book_class:any,e?:Event) => {
+const tabClass = async (book_class:string,e?:Event) => {
     // 激活点击样式
     if(e){
         const list = ((e.target as HTMLElement).parentNode as HTMLElement).children;
@@ -82,7 +109,41 @@ const tabClass = (book_class:any,e?:Event) => {
         (e.target as HTMLElement).classList.add('active');
     }
     // 重新获取分类数据
-    book.filterBook = book.books.filter((item:any) => item.book_class === book_class) ;
+    book.filterBook = book.books.filter((item:Book) => item.book_class === book_class) ;
+    getOrderState();
+}
+
+
+const s = new WebSocket(`ws://localhost:3002/wsapi/stockorder?user_id=${store.state.user.id}&role=${store.state.user.role}`);
+s.onmessage = ({data}) =>{
+    data =  JSON.parse(data);
+    getOrderState();
+    ElMessage({
+        message: data.msg,
+        type: data.type
+    })
+}
+/* 下单 */
+const stockHandler = (book:Book) => {
+    ElMessageBox.prompt('请输入购买的数量', '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        inputType:'text',
+        inputPattern: /^[0-9]+$/,
+        inputErrorMessage: '请输入数字',
+    })
+        .then(async ({value}) => {
+            const data = {
+                role: store.state.user.role,
+                data:{
+                    user_id: store.state.user.id,
+                    book_id: book.book_id,
+                    count: +value
+                }
+            }
+            s.send(JSON.stringify(data))
+            
+        })
 }
 
 </script>

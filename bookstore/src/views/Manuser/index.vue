@@ -9,13 +9,12 @@
                 placeholder="请输入关键字..."
                 @keyup.enter="HandleSearch" 
             />
-            <!-- 搜索按钮 -->
-            <el-button type="primary" class="search_btn" @click="HandleSearch">搜索</el-button>
             <!-- 条件搜索 -->
             <el-radio-group v-model="radio1" size="small" class="search_radio">
                 <el-radio-button label="全部" @keyup.enter="HandleSearch" />
                 <el-radio-button label="仅管理员" @keyup.enter="HandleSearch" />
                 <el-radio-button label="仅用户" @keyup.enter="HandleSearch" />
+                <el-radio-button label="仅商家" @keyup.enter="HandleSearch" />
             </el-radio-group>
         </div>
         <!-- 表格 -->
@@ -42,8 +41,9 @@
                             </p>
                             <p>
                                 <span>用户名: {{ props.row.username }}</span>
-                                <span v-if="props.row.sex">性别: {{ props.row.sex }}</span>
-                                <span v-if="props.row.site">收货地址: {{ props.row.site }}</span>
+                                <span v-if="props.row.role == '管理员'">性别: {{ props.row.sex }}</span>
+                                <span v-if="props.row.role == '用户'">收货地址: {{ props.row.site }}</span>
+                                <span v-if="props.row.role == '商家'">发货地址: {{ props.row.site }}</span>
                             </p>
                         </div>
                         <div class="right0" v-if="props.row.role == '管理员'">
@@ -74,6 +74,9 @@
                         {{ props.row.role }}
                     </el-tag>
                     <el-tag v-if="props.row.role === '管理员'" type="primary">
+                        {{ props.row.role }}
+                    </el-tag>
+                    <el-tag v-if="props.row.role === '商家'" type="warning">
                         {{ props.row.role }}
                     </el-tag>
                 </template>
@@ -123,6 +126,7 @@ const main = async () => {
     const { data } = await myAxios.get('/webapi/users', { params: { id: userStore.state.user.id } });
     obj.userData = data.data;
     obj.filterData = obj.userData;
+    
 }
 // 搜索
 const HandleSearch = () => {
@@ -157,6 +161,18 @@ const HandleSearch = () => {
                     return (
                         data.username.toLowerCase().includes(search.value.toLowerCase()) && data.role === '用户'
                         || data.id === +search.value && data.role === '用户'
+                    );
+                }
+            });
+            break;
+        case '仅商家':
+            obj.filterData = obj.userData.filter(data => {
+                if (!search.value) {
+                    return data.role === '商家'
+                } else {
+                    return (
+                        data.username.toLowerCase().includes(search.value.toLowerCase()) && data.role === '用户'
+                        || data.id === +search.value && data.role === '商家'
                     );
                 }
             });

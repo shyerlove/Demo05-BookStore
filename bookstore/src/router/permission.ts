@@ -3,7 +3,6 @@ import router from './routes.ts'
 import { ElMessage } from 'element-plus'
 router.beforeEach((to, from) => {
     const user = JSON.parse(sessionStorage.getItem('user') as string);
-    console.log(to);
 
     // 404
     if (to.matched.length == 0) {

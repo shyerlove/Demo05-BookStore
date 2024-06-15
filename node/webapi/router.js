@@ -24,6 +24,8 @@ const blackListController = require('../controllers/blackListController');
 const adminController = require('../controllers/adminController');
 const inventoryController = require('../controllers/inventoryController');
 const getBookClassController = require('../controllers/getBookClassController');
+const stockOrderController = require('../controllers/stockOrderController');
+const getStockStateController = require('../controllers/getStockStateController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -76,6 +78,10 @@ router.get('/admin', adminController);
 router.get('/inventory', inventoryController);
 // 获取类别及数量
 router.get('/bookclass', getBookClassController);
+// 进货
+router.post('/stackorder', stockOrderController);
+// 获取商家订单状态
+router.get('/stackorder', getStockStateController);
 
 
 /* 导出路由 */

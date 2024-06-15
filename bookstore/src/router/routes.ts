@@ -65,6 +65,12 @@ export default createRouter({
                     beforeEnter: grard.manage
                 },
                 {
+                    name: 'aorder',
+                    path: 'order',
+                    component: () => import('../views/Aorder/index.vue'),
+                    beforeEnter: grard.manage
+                },
+                {
                     name: 'manuser',
                     path: 'manuser',
                     component: () => import('../views/Manuser/index.vue'),
@@ -86,9 +92,9 @@ export default createRouter({
                     beforeEnter: grard.merchant
                 },
                 {
-                    name: 'hall',
-                    path: 'hall',
-                    component: () => import('../views/Hall/index.vue'),
+                    name: 'order',
+                    path: 'order',
+                    component: () => import('../views/Order/index.vue'),
                     beforeEnter: grard.merchant
                 },
                 {

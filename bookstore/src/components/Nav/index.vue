@@ -12,13 +12,13 @@
         <div class="flex-grow"></div>
         <template v-for="item in userStore.state.menus" :key="item.src">
             <el-menu-item :index="item.menu_src">
-                {{item.menu_name}}
+                    {{item.menu_name}}
             </el-menu-item>
         </template>           
     </el-menu>    
 </template>
  
-<script setup name="nav" lang="ts">
+<script setup name="mynav" lang="ts">
 
 import { onMounted, ref, watch } from 'vue'
 import { useStore } from 'vuex';

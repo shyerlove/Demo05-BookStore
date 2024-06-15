@@ -6,6 +6,7 @@ type Book = {
     book_imgUrl: string,
     book_inventory: number,
     book_cost: number,
+    stock_state?: number
 }
 
 export default Book;

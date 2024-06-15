@@ -14,13 +14,23 @@ const usersController = (req, res) => {
             }
             let newData = [];
             data.forEach(item => {
-                if (item.user_identity) {
+                if (item.user_identity == 1) {
                     newData.push({
                         id: item.user_id,
                         name: item.realname,
                         username: item.user_name,
                         site: item.site,
                         role: '用户',
+                        phone: item.user_phone,
+                        isBlack: item.isBlack
+                    })
+                } else if (item.user_identity == 2) {
+                    newData.push({
+                        id: item.user_id,
+                        name: item.realname,
+                        username: item.user_name,
+                        site: item.site,
+                        role: '商家',
                         phone: item.user_phone,
                         isBlack: item.isBlack
                     })
