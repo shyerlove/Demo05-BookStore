@@ -4,7 +4,7 @@ const shopcarController = (req, res) => {
     /* 获取id */
     let { id } = req.body;
     /* 查询数据库，获取购物车数据 */
-    let sql = `select * from books.bookdata,books.shopcar where books.bookdata.book_id = books.shopcar.book_id and books.shopcar.user_id = ?`;
+    let sql = 'call getShopcar(?);';
     query(sql, [id], (err, data) => {
         if (err) {
             console.log(err);
@@ -17,7 +17,7 @@ const shopcarController = (req, res) => {
         res.json({
             code: 200,
             msg: '获取购物车数据成功',
-            data
+            data: data[0]
         });
     });
 }

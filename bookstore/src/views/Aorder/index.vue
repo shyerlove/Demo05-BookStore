@@ -2,6 +2,7 @@
      <el-table 
         :data="obj.tableData" 
         style="width: 100%;height: 90vh;"
+        empty-text="暂无订单..."
         :header-row-style="{'height':'10vh'}"
         :header-cell-style="{ 'text-align': 'center' }" 
         :cell-style="{ 'text-align': 'center','height':'15vh' }" 

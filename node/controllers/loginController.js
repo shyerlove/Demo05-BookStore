@@ -9,6 +9,7 @@ const loginController = (req, res) => {
             return res.json({
                 code: 500,
                 msg: '账号或密码错误',
+                type: 'error',
                 data: null
             });
         }
@@ -18,6 +19,7 @@ const loginController = (req, res) => {
         res.json({
             code: 200,
             msg: '登录成功',
+            type: 'success',
             data: {
                 id: data[0].user_id,
                 realname: data[0].realname,

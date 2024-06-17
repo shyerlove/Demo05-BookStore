@@ -35,14 +35,15 @@ export default createStore({
                     user_id: context.state.user.id
                 }
             })
+
             context.commit('initOrder', data.data);
         },
         /* 加载菜单数据 */
-        async initMenus(context) {
+        async initMenus(context, payload) {
             const { data } = await myAxios({
                 url: '/webapi/menus',
                 method: 'get',
-                params: { role: context.state.user.role }
+                params: { role: payload }
             })
             context.commit('initMenus', data.data);
         }

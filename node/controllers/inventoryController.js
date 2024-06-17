@@ -2,7 +2,7 @@ const query = require('../db');
 
 const inventoryController = (req, res) => {
     const { user_id, } = req.query;
-    const sql = 'select bookdata.book_id,msg,book_name,book_class,book_press,book_price,book_count from storebookdata,bookdata where user_id = ? and storebookdata.book_id = bookdata.book_id ;';
+    const sql = 'select bookdata.book_id,msg,book_name,book_class,book_press,book_price,book_count from storebookdata,bookdata where store_id = ? and storebookdata.book_id = bookdata.book_id ;';
     try {
         query(sql, [user_id], (err, data) => {
             if (err) {

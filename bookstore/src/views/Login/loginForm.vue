@@ -1,5 +1,6 @@
 <template>
-  <div :class="isLogin ? 'loginForm' : 'signForm'">
+    <Transition name="login">
+      <div :class="isLogin ? 'loginForm' : 'signForm'">
     <el-form 
       class="form" 
       v-show="isLogin" 
@@ -11,7 +12,7 @@
         <el-input class="inp" type="text" placeholder="用户名" v-model="loginForm.username" prefix-icon="User" clearable />
       </el-form-item>
       <el-form-item prop="password" class="form_item">
-        <el-input class="inp" type="password" placeholder="密码" v-model="loginForm.password" prefix-icon="Lock" clearable
+        <el-input class="inp" type="password" placeholder="密码"  v-model="loginForm.password" prefix-icon="Lock" clearable
           show-password @keyup.enter="login(loginRef)" />
       </el-form-item>
       <el-button @click="login(loginRef)">登录</el-button>
@@ -54,7 +55,6 @@
           <el-radio-group v-model="signForm.identity" class="ml-4" style="position: absolute;right:0">
             <el-radio-button :value="1" style="color:white;">用户</el-radio-button>
             <el-radio-button :value="0" style="color:white;">管理员</el-radio-button>
-            <el-radio-button :value="2" style="color:white;">商家</el-radio-button>
           </el-radio-group>
         </el-form-item>
       </div>
@@ -65,6 +65,7 @@
       </div>
     </el-form>
   </div>
+    </Transition>
 </template>
 
 <script setup name="loginForm" lang="ts">
@@ -98,8 +99,8 @@ const signRef = ref();
 let isLogin = ref<boolean>(true);
 // 登录表单数据
 const loginForm = reactive<loginForm>({
-  username: "",
-  password: "",
+  username:'',
+  password:'',
 });
 // 注册表单数据
 const signForm = reactive<signForm>({
@@ -149,8 +150,8 @@ const rule = reactive({
 const tabLogin = () => {
   // 清空数据
   if (isLogin.value) {
-    loginForm.username = "";
-    loginForm.password = "";
+    loginForm.username = '' ;
+    loginForm.password = '' ;
   } else {
     signForm.username = "";
     signForm.password = "";
@@ -168,52 +169,42 @@ const forget = () => {
 }
 /* 登录 */
 const login = async (loginDOM:FormInstance) => {
-  await loginDOM.validate((valid) => {
-    if (!valid) {
-      return ;
-    } 
-    myAxios({
-    method: "POST",
-    url: "/webapi/login",
-    params: loginForm,
-  })
-    .then((res) => {
-      if (res.data.code === 200) {
-        // 获取token
-        const user = res.data.data;
-        // 存放在本地存储中
-        sessionStorage.setItem("user", JSON.stringify(user));
-        // 初始化store
-        userStore.commit('initUser', user);
-
-        // 提示登录成功
-        ElMessage({
-          message: "登录成功，欢迎回来",
-          type: "success",
-        });
-        //判断用户是管理员还是用户
-        if (user.role === 0) {
-          router.push("/man");
-        } else if(user.role === 1) {
-          router.push("/show");
-          userStore.dispatch('initOrder');
-        }else{
-          router.push("/merchant");
-        }
-      } else {
-        ElMessage({
-          message: "账号或密码错误!",
-          type: "warning",
-        });
-      }
-    })
-    .catch(() => {
-      ElMessage({
-        message: "请检查网络连接...",
-        type: "warning",
-      });
-    });
+  await loginDOM.validate((valid) => { 
+    if(!valid) return ;
   })  
+  
+  const {data} = await myAxios({
+    method: "POST",
+    url:'/webapi/login',
+    params:loginForm
+  })
+  console.log(data);
+  
+  if (data.code === 200) {
+    // 获取token
+    const user = data.data;
+    // 存放在本地存储中
+    sessionStorage.setItem("user", JSON.stringify(user));
+    // 初始化store
+    userStore.commit('initUser', user);
+    // 提示登录成功
+    ElMessage({
+      message: data.msg,
+      type: data.type,
+    });
+    //判断用户是管理员还是用户
+    if (user.role) {
+      router.push("/show");
+      userStore.dispatch('initOrder');
+    } else {
+      router.push("/man");
+    }
+  } else {
+    ElMessage({
+      message: data.msg,
+      type: data.type,
+    });
+  }
 };
 
 /* 注册 */
@@ -367,4 +358,21 @@ const sign = async (signDOM:FormInstance) => {
 
   }
 }
+
+
+.login-enter-active,
+.login-leave-active {
+    transition: all 0.3s linear;
+}
+
+.login-enter-from {
+    transform: translateX(100px);
+    opacity: 1;
+}
+
+.login-leave-from {
+   transform: translateX(-100px);
+   opacity: 0;
+}
+
 </style>

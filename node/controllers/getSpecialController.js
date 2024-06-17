@@ -1,7 +1,7 @@
 const query = require('../db');
 
 const getSpecialController = (req, res) => {
-    const sql = 'select * from bookData order by book_inventory desc limit 0,5 ;';
+    const sql = 'call getSpecial() ;';
     query(sql, [], (err, data) => {
         if (err) {
             return res.json({
@@ -12,7 +12,7 @@ const getSpecialController = (req, res) => {
         res.json({
             code: 200,
             msg: '获取成功',
-            data
+            data: data[0]
         })
     })
 }

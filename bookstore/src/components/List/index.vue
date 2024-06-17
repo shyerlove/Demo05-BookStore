@@ -1,13 +1,13 @@
 <template>
   <div :class="listDown?'list listDown':'list'">
     <ul >
-        <li  v-for="item in list" :key="item" @click="dialog(item)">
+        <li v-for="item in list" :key="item" @click="dialog(item)">
             <div class="img"> <img :src="'http://127.0.0.1:3002/img?i='+item.book_imgUrl" alt="加载中..."></div>
             <div class="tit">
                 <h2>{{ item.book_name }}</h2>
                 <strong>￥{{ item.book_price }}</strong>
             </div>
-            <span>{{item.book_name}}</span>
+            <span>{{item.msg}}</span>
         </li>
     </ul>
     <el-dialog v-model="dialogVisible" :title="(bookMsg as Book).store_name">
@@ -17,7 +17,7 @@
             </el-col>
             <el-col :span="12" class="right">
                 <h1>{{(bookMsg as Book).book_name}}</h1>
-                <p>{{(bookMsg as Book).book_name}}</p>
+                <p>{{(bookMsg as Book).msg}}</p>
                 <strong>￥ {{ (bookMsg as Book).book_price }}</strong>
                 <el-input-number v-model="num" :min="1" :max="100" class="number"/>
                <div class="btns">
@@ -39,6 +39,7 @@ const userStore = useStore();
 const {user} = userStore.state;
 // 接收父组件传过来的数据
 const props = defineProps(['listDown','list']);
+
 // 弹框数据
 const bookMsg = reactive({});
 // 对话框状态
@@ -56,7 +57,12 @@ const dialog = (data:Book) => {
 
 /* 加入购物车 */
 const addShopcar = async () => {
-    const result = await myAxios.post('/webapi/addShopcar',{user_id: user.id,book_id: (bookMsg as Book).book_id,count: num.value});
+    const result = await myAxios.post('/webapi/addShopcar',{
+        store_id: (bookMsg as Book).store_id,
+        user_id: user.id,
+        book_id: (bookMsg as Book).book_id,
+        count: num.value
+    });
     if(result.data.code == 200){
         ElMessage({
             message:'加入购物车成功，快去看看吧',
@@ -122,7 +128,8 @@ const addShopcar = async () => {
                     display: block;
                     font-size: 12px;                    
                     color:black;
-                    text-wrap: nowrap;
+                    overflow: hidden;
+                    white-space:nowrap;
                     text-overflow: ellipsis;
                     padding:0vh 1vw 3vh 1vw;
                 }

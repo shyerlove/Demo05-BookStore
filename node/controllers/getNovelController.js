@@ -1,7 +1,7 @@
 const query = require('../db');
 
 const getNovelController = (req, res) => {
-    const sql = 'select * from bookData where store_name = "新时代书店" limit 0,5';
+    const sql = 'call getNovel();';
     query(sql, [], (err, data) => {
         if (err) {
             return res.json({
@@ -12,7 +12,7 @@ const getNovelController = (req, res) => {
         res.json({
             code: 200,
             msg: '获取成功',
-            data
+            data: data[0]
         })
     })
 }

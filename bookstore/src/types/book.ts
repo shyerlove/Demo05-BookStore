@@ -4,8 +4,11 @@ type Book = {
     book_press: string,
     book_class: string,
     book_imgUrl: string,
-    book_inventory: number,
+    store_id: number,
+    store_name: string,
     book_cost: number,
+    book_price: number,
+    msg: string,
     stock_state?: number
 }
 

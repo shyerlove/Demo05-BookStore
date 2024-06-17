@@ -92,6 +92,7 @@ import { ElMessage, ElLoading } from 'element-plus'
 import myAxios from '@/use/myAxios';
 import fenlei from '@/utils/shopcar.js'
 
+
 // 获取用户基本数据
 const userStore = useStore();
 const {user} = userStore.state;
@@ -115,6 +116,16 @@ const obj = reactive<any>({
     showcarData: [],
     list: []
 })
+// 建立通信
+const userSocket = new WebSocket(`ws://localhost:3002/wsapi/userorder?user_id=${userStore.state.user.id}`) ;
+userSocket.onmessage = ({data}) => {
+    data = JSON.parse(data);
+    ElMessage({
+        message: data.msg,
+        type: data.type
+    })
+    isPay.value = false ;
+}
 let openPayWin = () => {
     if(obj.list.length > 0) {
         isPay.value = true ;
@@ -191,6 +202,7 @@ const all = () => {
     isAll.value = !isAll.value ;
 }
 
+
 /* 支付 */
 const buy = () => {
     // 获取商品的id及数量集合
@@ -202,37 +214,14 @@ const buy = () => {
             }
         })
     }) ;
-    myAxios({
-        method:'POST',
-        url:'/webapi/buyBook',
-        data:{
-            user_id: user.id,
-            books
-        },
-    }).then( res =>{
-        const loading = ElLoading.service({
-            lock: true,
-            text: '加载中...',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
-        setTimeout(() => {
-            loading.close();
-            // 重新渲染数据
-            show();
-            // 提示支付成功
-            ElMessage({
-                message:'支付成功！',
-                type:'success'
-            });
-            // 关闭支付窗口
-            isPay.value = false ;
-        }, 2000)
-    }).catch( err => {
-        ElMessage({
-            message:'支付失败！',
-            type:'warning'
-        });
-    });
+    // 收集数据
+    const data = {
+        id: user.id,
+        books
+    } ;
+    // 发送支付消息
+    userSocket.send(JSON.stringify({role:1,data}));
+    
 }
    
 /* 批量删除 */

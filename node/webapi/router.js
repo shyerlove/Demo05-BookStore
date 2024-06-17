@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 
 const signController = require('../controllers/signController');
+const storeLoginController = require('../controllers/storeLoginController');
 const addShopcarController = require('../controllers/addShopcarController');
 const booksController = require('../controllers/booksController');
 const buyBookController = require('../controllers/buyBookController');
@@ -26,14 +27,17 @@ const inventoryController = require('../controllers/inventoryController');
 const getBookClassController = require('../controllers/getBookClassController');
 const stockOrderController = require('../controllers/stockOrderController');
 const getStockStateController = require('../controllers/getStockStateController');
+const getUserorderController = require('../controllers/getUserorderController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
 
 // 注册
 router.post('/sign', signController);
-// 登录
+// 用户登录
 router.post('/login', loginController);
+// 商家登录
+router.post('/storeLogin', storeLoginController);
 // 添加至购物车
 router.post('/addShopcar', addShopcarController);
 // 分页获取图书信息
@@ -82,7 +86,8 @@ router.get('/bookclass', getBookClassController);
 router.post('/stackorder', stockOrderController);
 // 获取商家订单状态
 router.get('/stackorder', getStockStateController);
-
+// 获取用户订单
+router.post('/userorder', getUserorderController);
 
 /* 导出路由 */
 module.exports = router;

@@ -4,7 +4,6 @@ const getMenusController = (req, res) => {
     const { role } = req.query;
 
     const sql = 'select * from menus where user_role = ? order by case when menu_name = "个人中心" then 1 else 0 end;';
-
     try {
         query(sql, [role], (err, data) => {
             if (err) {

@@ -11,6 +11,7 @@ myAxios.interceptors.request.use(
         if (config.url === '/webapi/login'
             || config.url === '/webapi/sign'
             || config.url === '/webapi/forget'
+            || config.url === '/webapi/storeLogin'
         ) {
             return config;
         } else {

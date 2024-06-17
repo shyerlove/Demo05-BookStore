@@ -5,6 +5,7 @@ const vToken = (req, res, next) => {
     /* 登录时不用校验 */
     if (req.path === '/webapi/login'
         || req.path === '/webapi/sign'
+        || req.path === '/webapi/storeLogin'
         || req.path === '/img'
         || req.path === '/webapi/forget'
         || req.path.includes('/wsapi')

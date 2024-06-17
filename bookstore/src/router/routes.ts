@@ -103,6 +103,12 @@ export default createRouter({
                     component: () => import('../views/Stock/index.vue'),
                     beforeEnter: grard.merchant
                 },
+                {
+                    name: 'deal',
+                    path: 'deal',
+                    component: () => import('../views/Deal/index.vue'),
+                    beforeEnter: grard.merchant
+                },
             ]
         },
         {

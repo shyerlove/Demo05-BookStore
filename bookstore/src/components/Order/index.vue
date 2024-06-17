@@ -12,8 +12,8 @@
             <p>{{ data.book_name }}</p>
             <span>
                 <div class="state">
-                    <img :src="svgs[data.order_state].src" style="width:2vw;">
-                    <p>{{svgs[data.order_state].msg}}</p>
+                    <img :src="data.userorder_state === 0 ? '/src/assets/svg/daifahuo.svg': data.userorder_state === 1 ? '/src/assets/svg/peisongzhong.svg':'/src/assets/svg/yiqianshou.svg'" style="width:2vw;">
+                    <p>{{data.userorder_state === 0 ? '待发货': data.userorder_state === 1 ? '配送中':'已签收'}}</p>
                 </div>
                 <div class="edit">
                     <el-button  round class="edit_btn" size="small">申请退款</el-button>

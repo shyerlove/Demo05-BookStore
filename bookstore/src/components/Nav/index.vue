@@ -29,8 +29,12 @@ const userStore = useStore();
 // 当前路径
 let activeIndex = ref<string>('') ;
 onMounted(async () => {
-    // 初始化菜单
-    await userStore.dispatch('initMenus');
+    // 初始化菜单    
+    if(userStore.state.user.role == undefined){
+        await userStore.dispatch('initMenus',2) ;
+    }else{
+        await userStore.dispatch('initMenus',userStore.state.user.role)
+    }
     // 刷新页面激活项不丢失
     activeIndex.value = window.location.pathname ;
 })

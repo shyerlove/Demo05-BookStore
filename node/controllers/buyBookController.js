@@ -5,24 +5,25 @@ const buyBookController = (req, res) => {
     const { user_id, books } = req.body;
 
     /* 定义SQL语句 */
+    const sql = 'call buy_book(?,?,?,?,?)';
+
     try {
-        books.forEach((item) => {
-            // 从购物车删除
-            let sql = `delete from shopcar where user_id=? and book_id = ?;`;
-            query(sql, [user_id, item['book_id']], () => { });
-            // 从库存中删除
-            let sql1 = 'update bookdata set book_inventory = book_inventory-? where book_id=?;';
-            query(sql1, [item['book_count'], item['book_id']], () => { });
-            // 添加至订单
-            let sql2 = 'insert into orderForm(user_id,book_id,book_count,order_state) values(?,?,?,?);';
-            query(sql2, [user_id, item['book_id'], item['book_count'], 0], () => { });
+        /* 连接数据库 */
+        books.forEach(b => {
+            query(sql, [b.shopCar_id, b.store_id, b.book_id, user_id, b.book_count], (err, data) => {
+                if (err) { throw err; }
+            });
         })
-    } catch (error) {
-        console.log(error);
-    } finally {
         res.json({
             code: 200,
-            msg: '支付成功'
+            type: 'success',
+            msg: '购买成功'
+        });
+    } catch (error) {
+        res.json({
+            code: 500,
+            type: 'error',
+            msg: '购买失败'
         })
     }
 }
