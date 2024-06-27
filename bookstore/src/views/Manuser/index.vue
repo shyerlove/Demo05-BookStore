@@ -10,11 +10,11 @@
                 @keyup.enter="HandleSearch" 
             />
             <!-- 条件搜索 -->
-            <el-radio-group v-model="radio1" size="small" class="search_radio">
-                <el-radio-button label="全部" @keyup.enter="HandleSearch" />
-                <el-radio-button label="仅管理员" @keyup.enter="HandleSearch" />
-                <el-radio-button label="仅用户" @keyup.enter="HandleSearch" />
-                <el-radio-button label="仅商家" @keyup.enter="HandleSearch" />
+            <el-radio-group v-model="radio1" size="small" class="search_radio" @change="HandleSearch">
+                <el-radio-button label="全部" />
+                <el-radio-button label="仅管理员" />
+                <el-radio-button label="仅用户" />
+                <el-radio-button label="仅商家" />
             </el-radio-group>
         </div>
         <!-- 表格 -->

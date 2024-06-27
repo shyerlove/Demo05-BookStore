@@ -82,7 +82,7 @@ router.get('/admin', adminController);
 router.get('/inventory', inventoryController);
 // 获取类别及数量
 router.get('/bookclass', getBookClassController);
-// 进货
+// 入库
 router.post('/stackorder', stockOrderController);
 // 获取商家订单状态
 router.get('/stackorder', getStockStateController);

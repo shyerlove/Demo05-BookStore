@@ -25,8 +25,8 @@
                 <p class="book_count">数量:{{ obj.deals.count }}</p>
                 <p class="book_allPrice">总计:{{ obj.deals.book_allPrice }}</p>
                 <div class="btns">
-                    <el-button @click="agree(obj.deals.userorder_id)">发货</el-button>
-                    <el-button @click="agree(obj.deals.userorder_id)">退款</el-button>
+                    <el-button @click="agree(obj.deals,1)">发货</el-button>
+                    <el-button @click="agree(obj.deals,0)">退款</el-button>
                 </div>
             </div>
         </div>
@@ -35,21 +35,17 @@
 
 <script setup lang="ts">
 import myAxios from '@/use/myAxios';
-import { ElMessage } from 'element-plus';
-import { runMain } from 'module';
+import mySocket from '@/use/useSocket';
 import { ref,reactive,onMounted } from 'vue' ;
 import { useStore } from 'vuex';
 const store = useStore();
 
-const storeSocket = new WebSocket(`ws://localhost:3002/wsapi/userorder?store_id=${store.state.user.id}`) ;
-storeSocket.onmessage = ({data}) => {
-    data = JSON.parse(data);
-    ElMessage({
-        message: data.msg,
-        type: data.type 
-    })
-    main();
-}
+// const storeSocket = new WebSocket(`ws://localhost:3002/wsapi/userorder?store_id=${store.state.user.id}`) ;
+const storeSocket = new mySocket(`/wsapi/userorder?store_id=${store.state.user.id}`,3);
+storeSocket.onMessaged(() => {
+    main() ;
+})
+
 
 const obj = reactive({
     dealList:<any>[],
@@ -58,6 +54,8 @@ const obj = reactive({
 const main = async () => {
     const { data } = await myAxios.post('/webapi/userorder',{store_id: store.state.user.id})
     obj.dealList = data.data ;
+    console.log(data.data);
+    
 }
 onMounted(async () => {
     await main() ;
@@ -86,10 +84,15 @@ const tabClass = async (book_id:number,e?:any) => {
     // 重新获取分类数据
     obj.deals = obj.dealList.filter((item:any) => item.book_id === book_id)[0] ;
 }
-const agree = (id:number) => {
-    const data = {userorder_id: id}
-    storeSocket.send(JSON.stringify({data}));
+const agree = (obj:any,tem:0|1) => {
+    const data = {
+        user_id:obj.user_id,
+        userorder_id: obj.userorder_id,
+        tem
+    }
+    storeSocket.send(data);
 }
+
 </script>
 
 <style scoped lang="scss">

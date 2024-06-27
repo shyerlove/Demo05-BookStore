@@ -9,37 +9,53 @@
         </div>
         <div class="right">
             <h1>{{ data.book_name }}</h1>
-            <p>{{ data.book_name }}</p>
+            <p>{{ data.msg }}</p>
             <span>
-                <div class="state">
-                    <img :src="data.userorder_state === 0 ? '/src/assets/svg/daifahuo.svg': data.userorder_state === 1 ? '/src/assets/svg/peisongzhong.svg':'/src/assets/svg/yiqianshou.svg'" style="width:2vw;">
-                    <p>{{data.userorder_state === 0 ? '待发货': data.userorder_state === 1 ? '配送中':'已签收'}}</p>
+                <div class="state" v-if="data.userorder_state===-1">
+                    <img :src="svgs[0].src" style="width:2vw;">
+                    <p>{{ svgs[0].msg}}</p>
+                </div>
+                <div class="state" v-if="data.userorder_state===0">
+                    <img :src="svgs[1].src" style="width:2vw;">
+                    <p>{{ svgs[1].msg}}</p>
+                </div>
+                <div class="state" v-if="data.userorder_state===1">
+                    <img :src="svgs[2].src" style="width:2vw;">
+                    <p>{{ svgs[2].msg}}</p>
+                </div>
+                <div class="state" v-if="data.userorder_state===2">
+                    <img :src="svgs[3].src" style="width:2vw;">
+                    <p>{{ svgs[3].msg}}</p>
                 </div>
                 <div class="edit">
-                    <el-button  round class="edit_btn" size="small">申请退款</el-button>
-                    <el-button  round class="edit_btn" size="small">确认收货</el-button>
+                    <el-button  round class="edit_btn"  v-if="data.userorder_state!==-1">申请退款</el-button>
+                    <el-button  round class="edit_btn"  v-if="data.userorder_state!==-1">确认收货</el-button>
+                    <el-button  round class="edit_btn"  v-if="data.userorder_state==-1">删除该订单</el-button>
                 </div>
             </span>
         </div>
        </div>
     </div>
-    <el-divider />
 </template>
 
 <script setup name="order" lang="ts">
 
 const prop = defineProps(['data']) ;
 const svgs = [
+        {src:'/src/assets/svg/yituikuan.svg',msg:'已退款'},
         {src:'/src/assets/svg/daifahuo.svg',msg:'待发货'},
         {src:'/src/assets/svg/peisongzhong.svg',msg:'配送中'},
         {src:'/src/assets/svg/yiqianshou.svg',msg:'已签收'}
     ] ;
+    console.log(prop.data);
+    
 </script>
 
 <style lang="scss" scoped>
 .order{
-    width:40vw;
+    width:80%;
     height: auto;
+    margin-bottom: 2vh;
     .head{
         width:100%;
         height: 5vh;
@@ -60,7 +76,7 @@ const svgs = [
     }
     .body{
         width:100%;
-        height: 20vh;
+        height: 30vh;
         border:1px solid skyblue;
         border-top:none;
         display: flex;
@@ -68,7 +84,7 @@ const svgs = [
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
         .left{
-            width:20%;
+            width:15%;
             height: 100%;
             display: flex;
             align-items: center;
@@ -82,23 +98,25 @@ const svgs = [
         }
 
         .right{
-            width:70%;
+            width:80%;
             height: 90%;
             margin-left: 1vw;
             
             h1{
-                font-size: 20px;
+                font-size: 1.625rem;
+                margin-bottom: 1vh;
             }
             p{
-                font-size: 14px;
+                font-size: 1.25rem;
                 text-wrap: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                margin-bottom: 2vh;
             }
             span{
                 display: block;
                 width:100%;
-                height: 10vh;
+                height: 15vh;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -116,13 +134,14 @@ const svgs = [
                         font-size: 14px;
                         color: black;
                         margin-left: 1vw;
+                        margin-bottom:0;
                     }
                 }
                 .edit{
                     width:100%;
-                    height: 5vh;
+                    height: 8vh;
                     display: flex;
-                    align-items: end;
+                    align-items: center;
                     justify-content: end;
 
                     .edit_btn:nth-child(1){

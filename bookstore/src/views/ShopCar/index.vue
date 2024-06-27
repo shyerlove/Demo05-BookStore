@@ -91,6 +91,7 @@ import { useStore } from 'vuex'
 import { ElMessage, ElLoading } from 'element-plus'
 import myAxios from '@/use/myAxios';
 import fenlei from '@/utils/shopcar.js'
+import mySocket from '@/use/useSocket';
 
 
 // 获取用户基本数据
@@ -117,15 +118,11 @@ const obj = reactive<any>({
     list: []
 })
 // 建立通信
-const userSocket = new WebSocket(`ws://localhost:3002/wsapi/userorder?user_id=${userStore.state.user.id}`) ;
-userSocket.onmessage = ({data}) => {
-    data = JSON.parse(data);
-    ElMessage({
-        message: data.msg,
-        type: data.type
-    })
+const userSocket = new mySocket(`/wsapi/userorder?user_id=${userStore.state.user.id}`,3) ;
+userSocket.onMessaged(() => {
     isPay.value = false ;
-}
+});
+
 let openPayWin = () => {
     if(obj.list.length > 0) {
         isPay.value = true ;
@@ -150,6 +147,7 @@ watch(()=>obj.showcarData,(newVal)=>{
         })
     }) ;
     obj.list = temList; 
+    console.log('@@@@',obj.list);
     
 },{deep:true});
 /* 初始化数据 */
@@ -216,12 +214,15 @@ const buy = () => {
     }) ;
     // 收集数据
     const data = {
-        id: user.id,
-        books
+        role: 1,
+        data: {
+            id: user.id,
+            books
+        }
+       
     } ;
     // 发送支付消息
-    userSocket.send(JSON.stringify({role:1,data}));
-    
+    userSocket.send(data);
 }
    
 /* 批量删除 */

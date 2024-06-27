@@ -3,7 +3,7 @@ const query = require('../db');
 const getMenusController = (req, res) => {
     const { role } = req.query;
 
-    const sql = 'select * from menus where user_role = ? order by case when menu_name = "个人中心" then 1 else 0 end;';
+    const sql = 'call get_routes(?) ;';
     try {
         query(sql, [role], (err, data) => {
             if (err) {
@@ -17,7 +17,7 @@ const getMenusController = (req, res) => {
             res.json({
                 code: 200,
                 msg: '查询成功',
-                data
+                data: data[0]
             })
         })
     } catch (error) {

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import grard from './grard'
 
+
 export default createRouter({
     history: createWebHistory(),
     routes: [
@@ -39,6 +40,12 @@ export default createRouter({
                     beforeEnter: grard.user
                 },
                 {
+                    name: 'userorder',
+                    path: 'order',
+                    component: () => import('../views/Userorder/index.vue'),
+                    beforeEnter: grard.user
+                },
+                {
                     name: 'shopcar',
                     path: 'shopcar',
                     component: () => import('../views/ShopCar/index.vue'),
@@ -47,7 +54,7 @@ export default createRouter({
                 {
                     name: 'my',
                     path: 'my',
-                    component: () => import('../views/My/index.vue')
+                    component: () => import('@/views/My/index.vue'),
                 }
             ]
         },

@@ -9,7 +9,7 @@
         :row-style="rowStyle"
      >
         <el-table-column prop="stock_id" label="订单号" width="150" />
-        <el-table-column prop="user_name" label="商家" width="150" />
+        <el-table-column prop="store_name" label="商家" width="150" />
         <el-table-column prop="book_name" label="书名" width="150" />
         <el-table-column prop="count" label="数量" width="150" />
         <el-table-column prop="all_price" label="总价" width="150" />
@@ -27,13 +27,13 @@
                     round type="primary" 
                     style="margin:0;"
                     :disabled="row.book_inventory - row.count < 0"
-                    @click="order(row.user_id,row.stock_id,2)"
+                    @click="order(row.store_id,row.stock_id,2)"
                 >接收订单</el-button>
                 <el-button 
                     round 
                     type="danger" 
                     style="margin:1vh 0;"
-                    @click="order(row.user_id,row.stock_id,0)"
+                    @click="order(row.store_id,row.stock_id,0)"
                 >取消订单</el-button>
             </template>
         </el-table-column>
@@ -47,7 +47,7 @@ import { ref,reactive,onMounted } from 'vue' ;
 import {useStore} from 'vuex';
 const store = useStore();
 
-const s = new WebSocket(`ws://localhost:3002/wsapi/stockorder?user_id=${store.state.user.id}&role=${store.state.user.role}`);
+const s = new WebSocket(`ws://localhost:3002/wsapi/stockorder?user_id=${store.state.user.id}`);
 s.onmessage = ({data}) =>{
     console.log(JSON.parse(data));
 }
@@ -90,11 +90,11 @@ const rowStyle = ({row}:{row:any}) => {
 }
 
 /* 操作订单 */
-const order = async (user_id:number,stock_id :number,stock_state :0 | 2) => {
+const order = async (store_id:number,stock_id :number,stock_state :0 | 2) => {
     const data = {
-        role: store.state.user.role,
+        role: 0,
         data:{
-            user_id,
+            store_id,
             stock_id,
             stock_state
         }

@@ -6,13 +6,10 @@
         :ellipsis="false"
         router
     >
-        <el-menu-item>
-            <img src="" alt="">
-        </el-menu-item>
         <div class="flex-grow"></div>
         <template v-for="item in userStore.state.menus" :key="item.src">
             <el-menu-item :index="item.menu_src">
-                    {{item.menu_name}}
+                    {{ item.menu_name }}
             </el-menu-item>
         </template>           
     </el-menu>    
@@ -37,6 +34,7 @@ onMounted(async () => {
     }
     // 刷新页面激活项不丢失
     activeIndex.value = window.location.pathname ;
+
 })
 
 

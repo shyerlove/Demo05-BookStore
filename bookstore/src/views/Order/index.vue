@@ -18,8 +18,8 @@
             <el-table-column prop="count" label="数量" width="150" />
             <el-table-column prop="stock_state" label="订单状态" width="150">
                 <template #default="{ row }">
-                    <span v-if="row.stock_state == 0">未处理</span>
-                    <span v-if="row.stock_state == 1">未同意</span>
+                    <span v-if="row.stock_state == 0">未同意</span>
+                    <span v-if="row.stock_state == 1">未处理</span>
                     <el-button 
                         v-if="row.stock_state == 2" 
                         type="primary"
@@ -47,11 +47,17 @@
 
 <script setup lang="ts" name="hall">
 import myAxios from '@/use/myAxios';
+import mySocket from '@/use/useSocket';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
+// 开启websocket连接
+const storeSocket = new mySocket(`/wsapi/stockorder?store_id=${store.state.user.id}`,3);
+storeSocket.onMessaged(() => {
+    main() ;
+})
 const isOpen = ref<boolean>(false);
 const book = reactive({
     stock_id:0,
@@ -66,8 +72,9 @@ onMounted(() => {
 });
 
 const main = async () => {
-    const { data } = await myAxios.get('/webapi/stackorder',{params:{user_id:store.state.user.id}});
+    const { data } = await myAxios.get('/webapi/stackorder',{params:{store_id:store.state.user.id}});
     obj.tableData = data.data ;
+    
 }
 /* 行样式 */
 const rowStyle = ({row}:{row:any}) => {
@@ -109,6 +116,7 @@ const initOrder = async () => {
         type:data.type
     })
     main();
+    isOpen.value = false ;
 }
 
 // 点击删除遗留订单

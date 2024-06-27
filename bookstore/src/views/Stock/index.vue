@@ -114,15 +114,10 @@ const tabClass = async (book_class:string,e?:Event) => {
 }
 
 
-const s = new WebSocket(`ws://localhost:3002/wsapi/stockorder?user_id=${store.state.user.id}&role=${store.state.user.role}`);
-s.onmessage = ({data}) =>{
-    data =  JSON.parse(data);
-    getOrderState();
-    ElMessage({
-        message: data.msg,
-        type: data.type
-    })
-}
+const s = new useSocket(`/wsapi/stockorder?store_id=${store.state.user.id}`,3) ;
+s.onMessaged(() => {
+    getOrderState() ;
+})
 /* 下单 */
 const stockHandler = (book:Book) => {
     ElMessageBox.prompt('请输入购买的数量', '提示', {
@@ -134,9 +129,9 @@ const stockHandler = (book:Book) => {
     })
         .then(async ({value}) => {
             const data = {
-                role: store.state.user.role,
+                role: 2,
                 data:{
-                    user_id: store.state.user.id,
+                    store_id: store.state.user.id,
                     book_id: book.book_id,
                     count: +value
                 }

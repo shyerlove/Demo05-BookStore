@@ -10,13 +10,14 @@ const userOrderChar = (ws, req) => {
     user_id == undefined
         ? stores.set(Number(store_id), ws)
         : users.set(Number(user_id), ws);
+
+
     ws.on('message', (msg) => {
         // 获取
-        const { role, data } = JSON.parse(msg);
+        const { role, data, message } = JSON.parse(msg);
         // 定义回复信息
         let xx = '';
-        role ? console.log(user_id) : console.log(store_id);
-        if (role) {
+        if (role == 1) {
             // 用户
             // 获取参数
             const { id, books } = data;
@@ -41,14 +42,14 @@ const userOrderChar = (ws, req) => {
                 xx = { code: 200, type: 'error', msg: '支付失败' };
                 ws.send(JSON.stringify(xx));
             }
-        } else {
+        } else if (role == 2) {
             // 商家
             // 获取订单id
-            const { userorder_id } = data;
+            const { user_id, userorder_id, tem } = data;
             // 定义sql语句
-            const sql = 'call deliver(?) ;';
+            const sql = 'call deliver(?,?) ;';
             // 处理订单
-            query(sql, [userorder_id, user_id], (err) => {
+            query(sql, [userorder_id, tem], (err) => {
                 if (err) {
                     // 提示错误信息
                     console.log(err);
@@ -63,6 +64,12 @@ const userOrderChar = (ws, req) => {
                 xx = { code: 200, type: 'warning', msg: '您的订单状态已更新' }
                 users.get(user_id).send(JSON.stringify(xx));
             })
+        } else {
+            // 心跳
+            console.log(message);
+            ws.send(JSON.stringify({
+                message: 'server...'
+            }))
         }
     })
 }

@@ -1,34 +1,14 @@
 <template>
     <div class="my">
-        <div class="my_left">
+        <ul class="left">
+            <li v-for="item in 5" class="item">{{item}}</li>
+        </ul>
+        <div class="right">
             <div class="top">
-                <!-- 头像 -->
-                <div class="head">
-                    <img src="../../assets/login_bgc.jpg" />
-                </div>
-                <div class="msg">
-                    <h2 class="user_name">{{ user.username }}</h2>
-                    <span class="tag">
-                        {{ user.role === 0 ? '管理员' : user.role === 1 ? '用户' : '商家' }}
-                    </span>
-                </div>
+                <el-avatar  class="img" shape="square" src="/public/logo.svg" />
+                <h2>shyerlove</h2>
             </div>
-            <div class="bottom">
-                <el-button type="primary" @click="edit">编辑个人信息</el-button>
-                <el-button type="primary" @click="myRouter.push('/forget')">修改密码</el-button>
-                <el-button type="primary" @click="esc">退出当前账号</el-button>
-            </div>
-        </div>
-        <div class="my_right" v-if="userStore.state.user.role == 1">
-            <div class="my_order">
-                <template v-for="item in userStore.state.order" :key="item.book_id">
-                    <Order :data="item" />
-                </template>
-                <h1 v-if="userStore.state.order.length == 0" class="noOrder">
-                    <img src="/src/assets/svg/zanwudingdan.svg">
-                    暂无订单,快去购物吧...
-                </h1>
-            </div>
+            <div class="bottom"></div>
         </div>
     </div>
 </template>
@@ -37,8 +17,9 @@
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import Order from '@/components/Order/index.vue';
-import { onMounted } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import myAxios from '@/use/myAxios';
 const userStore = useStore();
 const { user } = userStore.state;
 const myRouter = useRouter();
@@ -46,6 +27,7 @@ const myRouter = useRouter();
 onMounted(() => {
     userStore.dispatch('initOrder');
 })
+
 // 退出登录
 const esc = () => {
     ElMessageBox.confirm(
@@ -63,6 +45,10 @@ const esc = () => {
         myRouter.replace('/login');
     })
 }
+
+const edit = () => {
+    
+}
 </script>
 
 <style lang="scss" scoped>
@@ -75,113 +61,65 @@ const esc = () => {
     align-items: center;
     justify-content: space-between;
 
-    .my_left {
-        width: 40%;
+    .left,
+    .top,
+    .bottom {
+        width: 20%;
         height: 90%;
         background-color: rgba(245, 245, 245, 0.6);
         border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 1vh 1vw;
+    }
+    .left{
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        padding-top: 10vh;
-        box-shadow: 2px 2px 20px rgb(175, 174, 174);
-
-        .top {
-            width: 30vw;
-            height: 20vh;
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-
-            .head {
-                width: 10vw;
-                height: 10vw;
-                border-radius: 50%;
-
-                img {
-                    width: inherit;
-                    height: inherit;
-                    border-radius: inherit;
-                }
-            }
-
-            .msg {
-                width: auto;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: space-between;
-
-                .user_name {
-                    color: $blue;
-                }
-
-                .tag {
-                    display: block;
-                    width: 4vw;
-                    height: 3vh;
-                    text-align: center;
-                    line-height: 3vh;
-                    background-color: $blueplus;
-                    border-radius: 2px;
-                    opacity: 0.6;
-                    font-size: 14px;
-                    margin-top: 3vh;
-                    color: white;
-                }
-            }
-        }
-
-        .bottom {
-            width: 30vw;
-            height: 25vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
-
-            button {
-                width: 20vw;
-                margin: 0;
+        
+        .item{
+            width:100% ;
+            height: 8vh;
+            border-bottom: 1px solid #e9e9eb;
+            text-align: center;
+            line-height: 8vh;
+            transition: all .3s;
+            border-radius: .3125rem;
+            &:hover{
+                background-color: $blue;
+                cursor: pointer;
             }
         }
     }
-
-    .my_right {
-        width: 50%;
+    .right{
+        width:70%;
         height: 90%;
-        background-color: rgba(245, 245, 245, 0.6);
-        border-radius: 10px;
         display: flex;
         flex-direction: column;
-        align-items: center;
         justify-content: space-between;
-        padding: 10vh 0;
-        box-shadow: 2px 2px 20px rgb(175, 174, 174);
-        overflow-y: auto;
-
-        &::-webkit-scrollbar {
-            width: 4px;
+        .top{
+            width:100%;
+            height: 45%;
+            position: relative;
+            padding:0 2vw;
+            .img{
+                width: 25vh;
+                height: 25vh;
+                border-radius: inherit;
+                position: absolute;
+                top:calc((100% - 25vh) / 2) ;
+            }
+            h2{
+                position: absolute;
+                width:fit-content;
+                height: 10vh;
+                font-size: 1.875rem;
+                top:5vh;
+                left:32vh;
+            }
         }
-
-        &::-webkit-scrollbar-thumb {
-            border-radius: 2px;
-            background-color: gray;
+        .bottom{
+            width:100%;
+            height: 45%;
         }
-
-    }
-
-    .noOrder {
-        font-weight: 400;
-        display: flex;
-        font-size: 26px;
-        line-height: 60vh;
-
-        img {
-            width: 50px;
-        }
-
     }
 }
 </style>
