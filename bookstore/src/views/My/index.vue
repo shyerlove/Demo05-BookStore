@@ -2,6 +2,9 @@
     <div class="my">
         <ul class="left">
             <li v-for="item in 5" class="item">{{item}}</li>
+            <li class="btns">
+                <el-button @click="esc" type="danger" style="width:90%">退出登录</el-button>
+            </li>
         </ul>
         <div class="right">
             <div class="top">
@@ -74,7 +77,13 @@ const edit = () => {
     .left{
         display: flex;
         flex-direction: column;
-        
+        .btns{
+            height: 10%;
+           margin-top: auto;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+        }
         .item{
             width:100% ;
             height: 8vh;

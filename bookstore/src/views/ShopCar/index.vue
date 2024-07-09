@@ -86,7 +86,7 @@
 
 <script setup name="shopcar" lang="ts">
 import Shopcard from '../../components/Shopcard/index.vue'
-import { computed, reactive, ref, vShow, watch } from 'vue'
+import { computed, reactive, ref, vShow, watch,nextTick } from 'vue'
 import { useStore } from 'vuex'
 import { ElMessage, ElLoading } from 'element-plus'
 import myAxios from '@/use/myAxios';
@@ -119,8 +119,11 @@ const obj = reactive<any>({
 })
 // 建立通信
 const userSocket = new mySocket(`/wsapi/userorder?user_id=${userStore.state.user.id}`,3) ;
-userSocket.onMessaged(() => {
+userSocket.onMessaged(async () => {
     isPay.value = false ;
+    // 更新购物车数据
+    await show();
+    await nextTick();
 });
 
 let openPayWin = () => {
@@ -136,6 +139,7 @@ let openPayWin = () => {
 
 const show = async () => {
     obj.showcarData = fenlei((await myAxios.post('/webapi/shopCar',{id:user.id})).data.data); 
+    console.log('@@@@show');
 }
 watch(()=>obj.showcarData,(newVal)=>{
     const temList:shopCard[] = [] ;
@@ -147,7 +151,6 @@ watch(()=>obj.showcarData,(newVal)=>{
         })
     }) ;
     obj.list = temList; 
-    console.log('@@@@',obj.list);
     
 },{deep:true});
 /* 初始化数据 */
@@ -223,6 +226,7 @@ const buy = () => {
     } ;
     // 发送支付消息
     userSocket.send(data);
+    
 }
    
 /* 批量删除 */

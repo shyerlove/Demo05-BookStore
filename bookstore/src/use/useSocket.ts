@@ -2,9 +2,9 @@ import { ElMessage } from "element-plus";
 
 class mySocket<T> {
     static baseUrl: string = 'ws://localhost:3002'; // base URL
+    socket: WebSocket | null = null; // websocket实例
     url: string; // 路由地址
     timeout: number; // 心跳时间
-    socket: WebSocket | null = null; // websocket实例
     isLink: boolean = false;
     sendServerInterval: any;
     acceptServerInterval: any;
@@ -30,22 +30,20 @@ class mySocket<T> {
 
         // 监听接收信息事件
         this.socket.onmessage = ({ data }) => {
-
+            data = JSON.parse(data);
             // 处理数据
-            const { message } = JSON.parse(data);
+            const { message, msg, type } = data;
 
             // 收到回应，重新跳动
             this.isLink = true;
             clearTimeout(this.sendServerInterval);
             if (!message) {
                 ElMessage({
-                    message: data.msg,
-                    type: data.type
+                    message: msg,
+                    type: type
                 })
                 // 执行回调
-                if (this.messageCallback) {
-                    this.messageCallback();
-                }
+                this.messageCallback && this.messageCallback(data);
             }
             // 
             if (message) {

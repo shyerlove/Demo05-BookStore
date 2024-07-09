@@ -9,13 +9,8 @@ const stockOrderChar = (ws, req) => {
     // 获取查询参数
     const { user_id, store_id } = req.query;
     // 记录用户
-    if (user_id) {
-        users.set(Number(user_id), ws); // 记录管理员
-        console.log(user_id, '管理员已连接');
-    } else {
-        stores.set(Number(store_id), ws); // 记录商家
-        console.log(store_id, '商家已连接');
-    }
+    user_id && users.set(Number(user_id), ws); // 记录管理员
+    store_id && stores.set(Number(store_id), ws); // 记录商家
 
     ws.on('message', (msg) => {
         // 获取数据  
@@ -38,10 +33,8 @@ const stockOrderChar = (ws, req) => {
                 // 告知管理员操作结果
                 ws.send(JSON.stringify(xx));
                 // 告知商家更新订单数据
-                if (stores.get(store_id)) {
-                    xx = { code: 200, type: 'warning', msg: '您有订单已被处理' }
-                    stores.get(store_id).send(JSON.stringify(xx));
-                }
+                xx = { code: 200, type: 'warning', msg: '您有订单已被处理' }
+                stores.get(store_id) && stores.get(store_id).send(JSON.stringify(xx));
             });
 
         } else if (role == 2) {
@@ -63,7 +56,7 @@ const stockOrderChar = (ws, req) => {
                 users.forEach((item) => item.send(JSON.stringify(xx)))
             })
         } else {
-            console.log(message);
+            // console.log(message);
             ws.send(JSON.stringify({
                 message: 'server...'
             }));

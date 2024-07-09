@@ -2,7 +2,7 @@ const query = require('../db');
 
 const getUserorderController = (req, res) => {
     // 获取商家id
-    const { store_id } = req.body;
+    const { store_id } = req.query;
     // 定义查询语句
     const sql = 'call get_userorder(?) ;';
     try {

@@ -7,9 +7,8 @@ const stores = new Map();
 
 const userOrderChar = (ws, req) => {
     const { user_id, store_id } = req.query;
-    user_id == undefined
-        ? stores.set(Number(store_id), ws)
-        : users.set(Number(user_id), ws);
+    user_id && users.set(Number(user_id), ws);
+    store_id && stores.set(Number(store_id), ws);
 
 
     ws.on('message', (msg) => {
@@ -29,14 +28,14 @@ const userOrderChar = (ws, req) => {
                 books.forEach(b => {
                     query(sql, [b.shopCar_id, b.store_id, b.book_id, id, b.book_count], (err, data) => {
                         if (err) throw err;
+                        // 判断商家在不在线
+                        xx = { code: 200, type: 'warning', msg: '来新订单啦' }
+                        stores.get(b.store_id) && stores.get(b.store_id).send(JSON.stringify(xx));
                     });
                 })
                 // 提示用户支付成功
                 xx = { code: 200, type: 'success', msg: '支付成功' }
                 ws.send(JSON.stringify(xx));
-                // 告知商家更新新订单
-                xx = { code: 200, type: 'warning', msg: '来新订单啦' }
-                stores.forEach(store => store.send(JSON.stringify(xx)));
             } catch (error) {
                 // 提示用户支付失败
                 xx = { code: 200, type: 'error', msg: '支付失败' };
@@ -60,13 +59,13 @@ const userOrderChar = (ws, req) => {
                 // 提示商家操作成功
                 xx = { code: 200, type: 'success', msg: '操作成功' }
                 ws.send(JSON.stringify(xx));
-                // 告知用户订单已处理
-                xx = { code: 200, type: 'warning', msg: '您的订单状态已更新' }
-                users.get(user_id).send(JSON.stringify(xx));
+                // 如果用户在线,告知用户订单已处理
+                xx = { code: 200, type: 'warning', msg: '您有订单状态已更新' }
+                users.get(user_id) && users.get(user_id).send(JSON.stringify(xx));
             })
         } else {
             // 心跳
-            console.log(message);
+            // console.log(message);
             ws.send(JSON.stringify({
                 message: 'server...'
             }))

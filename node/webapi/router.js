@@ -28,6 +28,7 @@ const getBookClassController = require('../controllers/getBookClassController');
 const stockOrderController = require('../controllers/stockOrderController');
 const getStockStateController = require('../controllers/getStockStateController');
 const getUserorderController = require('../controllers/getUserorderController');
+const delUserorderController = require('../controllers/delUserorderController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -87,7 +88,9 @@ router.post('/stackorder', stockOrderController);
 // 获取商家订单状态
 router.get('/stackorder', getStockStateController);
 // 获取用户订单
-router.post('/userorder', getUserorderController);
+router.get('/userorder', getUserorderController);
+// 删除用户订单
+router.post('/userorder', delUserorderController);
 
 /* 导出路由 */
 module.exports = router;

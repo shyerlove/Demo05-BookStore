@@ -5,28 +5,32 @@
                 <input type="text">
                 <el-button type="primary">搜索</el-button>
             </span>
+            <h1 v-show="obj.dealList.length <= 0" style="margin:0 auto;">空空如也...</h1>
             <li 
+                v-show="obj.dealList.length > 0"
                 v-for="(item,index) in obj.dealList" 
                 :key="index" 
                 @click.stop="tabClass(item.book_id,$event)"
+                :class="index===0?'active':''"
             >
                 <p class="tit">xxx用户</p>
                 <p class="time">2022-9-2 12:22:11</p>
                 <p class=""></p>
             </li>
         </ul>
-        <div class="right">
-            <div class="img">
+        <div class="right" >
+            <h1 v-show="obj.dealList.length <= 0" style="margin:20%  auto;">没有交易记录...</h1>
+            <div class="img" v-show="obj.dealList.length > 0">
                 <img :src="'http://127.0.0.1:3002/img?i='+obj.deals.book_imgUrl" alt="加载中...">
             </div>
-            <div class="msg">
+            <div class="msg" v-show="obj.dealList.length > 0">
                 <p class="book_name">{{ obj.deals.book_name }}</p>
                 <p class="book_price">价格:{{ obj.deals.book_price }}</p>
                 <p class="book_count">数量:{{ obj.deals.count }}</p>
                 <p class="book_allPrice">总计:{{ obj.deals.book_allPrice }}</p>
                 <div class="btns">
-                    <el-button @click="agree(obj.deals,1)">发货</el-button>
-                    <el-button @click="agree(obj.deals,0)">退款</el-button>
+                    <el-button @click="agree(obj.deals,0)" type="warning">退款</el-button>
+                    <el-button @click="agree(obj.deals,1)" type="primary">发货</el-button>
                 </div>
             </div>
         </div>
@@ -36,25 +40,27 @@
 <script setup lang="ts">
 import myAxios from '@/use/myAxios';
 import mySocket from '@/use/useSocket';
-import { ref,reactive,onMounted } from 'vue' ;
+import { ref,reactive,onMounted, nextTick } from 'vue' ;
 import { useStore } from 'vuex';
 const store = useStore();
 
-// const storeSocket = new WebSocket(`ws://localhost:3002/wsapi/userorder?store_id=${store.state.user.id}`) ;
 const storeSocket = new mySocket(`/wsapi/userorder?store_id=${store.state.user.id}`,3);
-storeSocket.onMessaged(() => {
-    main() ;
+storeSocket.onMessaged(async () => {
+    await main() ;
+    await nextTick();
 })
-
 
 const obj = reactive({
     dealList:<any>[],
-    deals:<any>{}
+        deals:<any>{}
 })
+
 const main = async () => {
-    const { data } = await myAxios.post('/webapi/userorder',{store_id: store.state.user.id})
-    obj.dealList = data.data ;
-    console.log(data.data);
+    const { data } = await myAxios.get(`/webapi/userorder?store_id=${store.state.user.id}`)
+    console.log(data);
+    
+    obj.dealList = data.data.filter((item: any)=>item.userorder_state === 0 ) ;
+    console.log('更新交易记录:',obj.dealList);
     
 }
 onMounted(async () => {
@@ -86,11 +92,15 @@ const tabClass = async (book_id:number,e?:any) => {
 }
 const agree = (obj:any,tem:0|1) => {
     const data = {
-        user_id:obj.user_id,
-        userorder_id: obj.userorder_id,
-        tem
+        role:2,
+        data:{
+            user_id:obj.user_id,
+            userorder_id: obj.userorder_id,
+            tem
+        }
     }
     storeSocket.send(data);
+    main() ;
 }
 
 </script>

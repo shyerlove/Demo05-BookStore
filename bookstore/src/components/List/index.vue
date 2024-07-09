@@ -2,12 +2,7 @@
   <div :class="listDown?'list listDown':'list'">
     <ul >
         <li v-for="item in list" :key="item" @click="dialog(item)">
-            <div class="img"> <img :src="'http://127.0.0.1:3002/img?i='+item.book_imgUrl" alt="加载中..."></div>
-            <div class="tit">
-                <h2>{{ item.book_name }}</h2>
-                <strong>￥{{ item.book_price }}</strong>
-            </div>
-            <span>{{item.msg}}</span>
+           <BookCard :book="item"/>
         </li>
     </ul>
     <el-dialog v-model="dialogVisible" :title="(bookMsg as Book).store_name">
@@ -35,6 +30,7 @@ import {reactive, ref} from 'vue'
 import {useStore} from 'vuex'
 import { ElMessage } from 'element-plus';
 import type Book from '@/types/book';
+import BookCard from '@/components/BookCard/index.vue' ;
 const userStore = useStore();
 const {user} = userStore.state;
 // 接收父组件传过来的数据
@@ -90,60 +86,6 @@ const addShopcar = async () => {
             grid-template-columns: repeat(5,1fr);
             gap: 2vw;   
 
-            & li{
-                height: 40vh;
-                background-color: #ecf5ff;
-                border-radius: 3px;
-                transition: all 0.1s linear;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                .img{
-                    width:100%;
-                    height: 60%;
-                    padding:10px 0;
-                    display: flex;
-                    justify-content: center;
-                    background-color: white;
-                    img{
-                        width:60%;
-                        height: 100%;
-                    }
-                }
-                .tit{
-                   display: flex;
-                   align-items: center;
-                   justify-content: space-between;
-                   padding:0 1vw;
-                   h2{
-                    color:black;
-                    font-size: 14px;
-                   }
-                   strong{
-                    color:black;
-                    font-size: 24px;
-                   }
-                }
-                span{
-                    display: block;
-                    font-size: 12px;                    
-                    color:black;
-                    overflow: hidden;
-                    white-space:nowrap;
-                    text-overflow: ellipsis;
-                    padding:0vh 1vw 3vh 1vw;
-                }
-            }
-            & li:hover{
-                cursor: pointer;
-                transform: translateY(-5px);
-                box-shadow: 1px 1px 6px 1px gray;
-            }
-        }
-        &>h1{
-            height: 50px;
-            margin: calc(40vh - 25px );
-            text-align: center;
         }
     }
     .listDown{

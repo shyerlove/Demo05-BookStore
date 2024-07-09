@@ -28,9 +28,25 @@
                     <p>{{ svgs[3].msg}}</p>
                 </div>
                 <div class="edit">
-                    <el-button  round class="edit_btn"  v-if="data.userorder_state!==-1">申请退款</el-button>
-                    <el-button  round class="edit_btn"  v-if="data.userorder_state!==-1">确认收货</el-button>
-                    <el-button  round class="edit_btn"  v-if="data.userorder_state==-1">删除该订单</el-button>
+                    <el-button  
+                        round 
+                        class="edit_btn"  
+                        v-if="data.userorder_state!==-1"
+                        @click="DealOrder(data.userorder_id,'REFUND')"
+                        :disabled="data.userorder_state == -2"
+                    >{{data.userorder_state == -2 ?'申请退款中...':'申请退款'}}</el-button>
+                    <el-button  
+                        round 
+                        class="edit_btn"  
+                        v-if="data.userorder_state===2"
+                        @click="DealOrder(data.userorder_id,'OK')"
+                    >确认收货</el-button>
+                    <el-button  
+                        round 
+                        class="edit_btn"  
+                        v-if="data.userorder_state===-1"
+                        @click="DealOrder(data.userorder_id,'DELETE')"
+                    >删除该订单</el-button>
                 </div>
             </span>
         </div>
@@ -39,15 +55,45 @@
 </template>
 
 <script setup name="order" lang="ts">
+import myAxios from '@/use/myAxios';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
-const prop = defineProps(['data']) ;
+
+const props = defineProps(['data','main']) ;
 const svgs = [
         {src:'/src/assets/svg/yituikuan.svg',msg:'已退款'},
         {src:'/src/assets/svg/daifahuo.svg',msg:'待发货'},
         {src:'/src/assets/svg/peisongzhong.svg',msg:'配送中'},
         {src:'/src/assets/svg/yiqianshou.svg',msg:'已签收'}
     ] ;
-    console.log(prop.data);
+    
+// 修改订单状态
+const DealOrder =  (userorder_id: number,state: string) => {
+    let message = state == 'OK' ? '确认收货?':state == 'DELETE' ? '确认删除该订单?':'确认退款吗?';
+    ElMessageBox.confirm(
+    message,
+    'Warning',
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async () => {
+    const {data:{msg,type}} = await myAxios({
+    url:'/webapi/userorder',
+    method:'POST',
+    data:{
+        userorder_id,
+        state
+    }
+});
+  ElMessage({message: msg,type});
+  await props.main();
+  });
+
+}
+
+
     
 </script>
 
@@ -55,7 +101,7 @@ const svgs = [
 .order{
     width:80%;
     height: auto;
-    margin-bottom: 2vh;
+    margin: 1Svh 0 ;
     .head{
         width:100%;
         height: 5vh;
