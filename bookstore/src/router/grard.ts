@@ -16,7 +16,7 @@ const grard = {
     },
     /* 商家路由 */
     merchant: () => {
-        if (JSON.parse(sessionStorage.getItem('user') as string).store_id) {
+        if (!JSON.parse(sessionStorage.getItem('user') as string).store_id) {
             /* 商家，直接跳转管理页面 */
             return '/merchant';
         }

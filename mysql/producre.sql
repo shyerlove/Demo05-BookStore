@@ -31,7 +31,7 @@ create procedure add_shopcar(v_user_id INT, v_book_id INT,v_store_id INT, v_coun
             END IF ;
 		end $
 
-delimiter;
+delimiter ;
 
 desc bookdata;
 # 添加书的信息
@@ -47,7 +47,7 @@ create procedure add_book(book_name varchar(30),book_press varchar(50),book_imgU
             end if ;
         end $
 
-delimiter;
+delimiter ;
 
 # 删除书
 delimiter $
@@ -62,7 +62,7 @@ create procedure del_book(book_id int)
             end if ;
         end $
 
-delimiter;
+delimiter ;
 
 # 购买书(商家id,图书id,用户id,数量)
 delimiter $
@@ -91,7 +91,7 @@ create procedure buy_book(v_shopcar_id INT,v_store_id INT, v_book_id INT, v_user
             DELETE FROM shopcar WHERE shopCar_id = v_shopcar_id ;
         end $
 
-delimiter;
+delimiter ;
 
 # 处理用户订单
 delimiter $
@@ -127,7 +127,7 @@ create procedure deliver(v_userorder_id INT, v_tem INT)
 			END IF ;
         end $
 
-delimiter;
+delimiter ;
 
 # 加入黑名单
 
@@ -146,7 +146,7 @@ create procedure updateBlackList(id int, c int)
             set sql_safe_updates = on ;
         end $
 
-delimiter;
+delimiter ;
 
 # 订单状态
 delimiter $
@@ -167,7 +167,7 @@ create procedure addStockState(v_store_id INT, v_book_id INT,v_count INT)
 			END IF ;
 		end $
 
-delimiter;
+delimiter ;
 
 # 入库
 delimiter $
@@ -195,7 +195,7 @@ create procedure stock(v_stock_id int, v_price decimal(5,2), v_msg text)
 			END IF ;
 		end $
 
-delimiter;
+delimiter ;
 
 select * from stocktable;
 # 管理员处理订单
@@ -233,7 +233,7 @@ CREATE PROCEDURE adminDoOrder(v_stock_id INT,v_val INT) -- v_val: 0 拒绝 2 接
             
 		END $
 
-DELIMITER;
+DELIMITER ;
 
 # 获取路由
 
@@ -248,7 +248,7 @@ CREATE PROCEDURE get_routes(v_role INT)
         order by case when menu_name = "个人中心" then 1 else 0 end ;
     END $
 
-DELIMITER;
+DELIMITER ;
 
 # 用户处理订单状态
 
@@ -264,5 +264,20 @@ CREATE PROCEDURE dealUserorder(v_userorder_id INT, v_state VARCHAR(50))
 				WHERE userorder_id = v_userorder_id;
 			END IF ;
 		END $
+
+DELIMITER ;
+
+DELIMITER $
+
+CREATE PROCEDURE uploadHead(v_id INT, v_role INT, v_src TEXT)
+BEGIN
+    IF v_role in(2) THEN
+        UPDATE stores SET headImg = v_src WHERE store_id = v_id ;
+        SELECT * FROM stores WHERE store_id = v_id ;
+    ELSE
+        UPDATE users SET headImg = v_src WHERE user_id = v_id ;
+        SELECT * FROM users WHERE user_id = v_id ;
+    END IF ;
+END $
 
 DELIMITER ;

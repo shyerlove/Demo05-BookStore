@@ -6,13 +6,12 @@ router.beforeEach((to, from) => {
 
     // 404
     if (to.matched.length == 0) {
-        console.log(404);
         return '/notfound';
     }
     // 验证token
     if (to.meta.requireAuth) {
         /* 没有token，跳转到登录界面 */
-        if (user == null) {
+        if (!user) {
             /* 提示前往登录 */
             ElMessage({
                 message: '请先登录',

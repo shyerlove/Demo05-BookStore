@@ -26,7 +26,7 @@
                 <el-input v-model="form.phone"  />
             </el-form-item>
             <el-button type="primary" @click="submitForm(forgetFormRef)">确认修改</el-button>
-            <el-button type="warning" style="margin-right: 10px;" @click="backLogin">返回登录</el-button>
+            <el-button type="warning" style="margin-right: 10px;" @click="backLogin">返回</el-button>
         </el-form>
         <div class="title" v-show="isRemember">
             <h1>{{h1.s}}秒后跳转至登录页{{ h1.str }}</h1>

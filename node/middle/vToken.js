@@ -7,6 +7,7 @@ const vToken = (req, res, next) => {
         || req.path === '/webapi/sign'
         || req.path === '/webapi/storeLogin'
         || req.path === '/img'
+        || req.path === '/head'
         || req.path === '/webapi/forget'
         || req.path.includes('/wsapi')
     ) {

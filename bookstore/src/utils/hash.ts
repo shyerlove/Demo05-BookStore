@@ -1,7 +1,7 @@
 import SparkMD5 from 'spark-md5'
 
 
-const hash = (blob: Blob) => {
+const hash = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
         const spark = new SparkMD5.ArrayBuffer();
         const fr = new FileReader();

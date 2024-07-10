@@ -40,7 +40,6 @@ const login = async () => {
             message: data.msg,
             type: data.type,
         });
-
         router.push('/merchant');
     }else{
         ElMessage({

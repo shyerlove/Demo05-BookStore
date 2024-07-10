@@ -15,6 +15,10 @@ export default createStore({
         initUser(state, payload) {
             state.user = payload;
         },
+        updateUser(state, payload) {
+            state.user = { ...state.user, ...payload };
+            sessionStorage.setItem('user', JSON.stringify(state.user));
+        },
         clearUser(state) {
             state.user = null;
         },
@@ -45,6 +49,8 @@ export default createStore({
                 method: 'get',
                 params: { role: payload }
             })
+            console.log(data);
+
             context.commit('initMenus', data.data);
         }
     }

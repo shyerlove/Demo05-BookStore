@@ -29,6 +29,7 @@ const stockOrderController = require('../controllers/stockOrderController');
 const getStockStateController = require('../controllers/getStockStateController');
 const getUserorderController = require('../controllers/getUserorderController');
 const delUserorderController = require('../controllers/delUserorderController');
+const uploadHeadController = require('../controllers/uploadHeadController');
 /* 创建路由对象 */
 const router = express.Router();
 const upload = multer();
@@ -91,6 +92,7 @@ router.get('/stackorder', getStockStateController);
 router.get('/userorder', getUserorderController);
 // 删除用户订单
 router.post('/userorder', delUserorderController);
-
+// 上传头像
+router.post('/headimg', upload.any(), uploadHeadController);
 /* 导出路由 */
 module.exports = router;

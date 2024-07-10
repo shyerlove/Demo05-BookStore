@@ -3,33 +3,77 @@
         <ul class="left">
             <li v-for="item in 5" class="item">{{item}}</li>
             <li class="btns">
-                <el-button @click="esc" type="danger" style="width:90%">退出登录</el-button>
+                <el-button @click="$router.push({name:'forget'})"  type="primary" style="width:90%">修改个人信息</el-button>
+                <el-button  @click="esc" type="danger" style="width:90%;margin:0;">退出登录</el-button>
             </li>
         </ul>
         <div class="right">
             <div class="top">
-                <el-avatar  class="img" shape="square" src="/public/logo.svg" />
-                <h2>shyerlove</h2>
+                <label class="img">
+                    <input type="file"  style="visibility: hidden;" @change="upload">
+                    <el-avatar  class="img" ref="head" shape="square" :src="src" />
+                </label>
+                <h2>{{userStore.state.user.username}}</h2>
             </div>
             <div class="bottom"></div>
         </div>
     </div>
 </template>
 
-<script setup name="my">
+<script setup name="my" lang="ts">
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import Order from '@/components/Order/index.vue';
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import myAxios from '@/use/myAxios';
+import toBuffer from '@/utils/urlToBuffer';
+import hash from '@/utils/hash';
 const userStore = useStore();
 const { user } = userStore.state;
 const myRouter = useRouter();
 // 初始化订单
 onMounted(() => {
     userStore.dispatch('initOrder');
+    if(userStore.state.user.headImg){
+        src.value = 'http://127.0.0.1:3002/head?headImg='+userStore.state.user.headImg;
+    }else{
+        src.value = '/public/defaultHead.png';
+    }
 })
+
+const src = ref<string>('');
+// 上传头像
+const upload = (e: Event) => {
+    if((e.target as HTMLFormElement).files[0].type.split('/')[0] !=='image' || (e.target as HTMLFormElement).files.length > 1){
+        ElMessage({message:'请上传图片!',type:'error'});
+        return ;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL((e.target as HTMLFormElement).files[0]);
+    reader.onload = async (event) => {
+        const fromdata = new FormData();
+        let blob = await toBuffer((event.target?.result as string) ) ;
+        let h = await hash(blob);
+        fromdata.append('id',userStore.state.user.id);
+        fromdata.append('role',userStore.state.user.role);
+        fromdata.append('hash',h);
+        fromdata.append('file',blob);
+        const {data} = await myAxios({
+            method:'POST',
+            url:'/webapi/headimg',
+            data:fromdata,
+            headers: {
+                'Content-Type':'multipart/form-data'
+            }
+        });
+        ElMessage({message:data.msg,type:data.type})
+        if(data.code === 200){
+            userStore.commit('updateUser',data.data);
+            src.value = 'http://127.0.0.1:3002/head?headImg='+userStore.state.user.headImg;
+        }
+    }
+}
 
 // 退出登录
 const esc = () => {
@@ -78,11 +122,12 @@ const edit = () => {
         display: flex;
         flex-direction: column;
         .btns{
-            height: 10%;
-           margin-top: auto;
-           display: flex;
-           align-items: center;
-           justify-content: center;
+            height: 20%;
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
         }
         .item{
             width:100% ;
@@ -115,6 +160,35 @@ const edit = () => {
                 border-radius: inherit;
                 position: absolute;
                 top:calc((100% - 25vh) / 2) ;
+                overflow: hidden;
+
+                .img::after{
+                    content: '点击上传头像';
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;                   
+                    width:inherit;
+                    height: inherit;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    position: absolute;
+                    top:0;
+                    font-size: 1.25rem;
+                    transition: transform .2s, font-size .1s;
+                    overflow: hidden;
+                    transform: scale(0)
+                }
+
+                &:hover{
+                    cursor: pointer;
+                    &::after{
+                        transform: scale(1)
+                    }
+                }
+                &:active{
+                    &::after{
+                        font-size: small;
+                    }
+                }
             }
             h2{
                 position: absolute;

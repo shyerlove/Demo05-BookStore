@@ -56,7 +56,6 @@ class mySocket<T> {
         }
         this.socket.onclose = () => {
             this.isLink = false;
-            console.log('与服务器断开连接...');
         }
         this.socket.onerror = (err) => {
             console.error('@@', err);

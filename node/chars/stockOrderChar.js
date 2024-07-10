@@ -63,6 +63,10 @@ const stockOrderChar = (ws, req) => {
         }
     })
 
+    ws.on('close', function () {
+        users.get(Number(user_id)) && users.delete(Number(user_id));
+        stores.get(Number(store_id)) && stores.delete(Number(store_id));
+    });
 
     ws.on('error', (err) => {
         console.log(err);

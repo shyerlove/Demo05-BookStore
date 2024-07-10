@@ -7,7 +7,7 @@
                 </tr>
            </thead>
            <tbody>
-                <tr v-for="b in state.temPage" :key="(b as Book).book_id" class="tb_list">
+                <tr v-for="b in state.temPage" :key="(b as BookData).book_id" class="tb_list">
                     <td>{{ b.book_id }}</td>
                     <td>{{ b.book_name }}</td>
                     <td>{{ b.book_press }}</td>
@@ -42,21 +42,21 @@
             >
                 <el-form-item label="书名" prop="book_name">
                     <el-input
-                        v-model="(state.formData as Book).book_name"
+                        v-model="(state.formData as BookData).book_name"
                         type="text"
                         autocomplete="off"
                     />
                 </el-form-item>
                 <el-form-item label="出版社" prop="book_press">
                     <el-input
-                    v-model="(state.formData as Book).book_press"
+                    v-model="(state.formData as BookData).book_press"
                         type="text"
                         autocomplete="off"
                     />
                 </el-form-item>
                 <el-form-item label="类别" prop="book_class">
                     <el-input
-                    v-model="(state.formData as Book).book_class"
+                    v-model="(state.formData as BookData).book_class"
                         type="text"
                         autocomplete="off"
                     />
@@ -73,10 +73,10 @@
                     </label>
                 </el-form-item>
                 <el-form-item label="库存" prop="book_inventory">
-                    <el-input-number v-model="(state.formData as Book).book_inventory" :min="0" :max="1000"  />
+                    <el-input-number v-model="(state.formData as BookData).book_inventory" :min="0" :max="1000"  />
                 </el-form-item>
                 <el-form-item label="成本价" prop="book_cost">
-                    <el-input-number v-model="(state.formData as Book).book_cost" :min="0" :max="1000"  />
+                    <el-input-number v-model="(state.formData as BookData).book_cost" :min="0" :max="1000"  />
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="dialogTableVisible=false">取消</el-button>
@@ -98,12 +98,12 @@
 import myAxios from "@/use/myAxios";
 import { reactive,ref } from "vue";
 import { ElMessage, FormInstance} from 'element-plus'
-import type Book from '@/types/book';
+import type BookData from '@/types/bookData';
 import toBuffer from "@/utils/urlToBuffer";
 import hash from '@/utils/hash';
 type state = {
-    temPage:Array<Book>|[],
-    formData:Book|{}
+    temPage:Array<BookData>|[],
+    formData:BookData|{}
 }
 
 // 表单验证规则
@@ -179,7 +179,7 @@ const change = (cur:number) => {
 }
 
 /* 打开编辑框 */
-const edit = (book:Book,isadd:boolean) => {
+const edit = (book:BookData,isadd:boolean) => {
     // 确定是添加还是修改
     isAdd.value = isadd ;
     /* 弹出编辑框 */
@@ -187,7 +187,7 @@ const edit = (book:Book,isadd:boolean) => {
     /* 初始化数据 */
     state.formData = book ;
     // 初始化src
-    src.value = 'http://127.0.0.1:3002/img?i='+(state.formData as Book).book_imgUrl;
+    src.value = 'http://127.0.0.1:3002/img?i='+(state.formData as BookData).book_imgUrl;
     
 }
 
@@ -218,7 +218,7 @@ const add = () => {
         book_inventory:0,
         book_cost:0,
     };
-    edit(state.formData as Book,true);
+    edit(state.formData as BookData,true);
 }
 /* 确认修改 */
 const confirm = async (formDOM:FormInstance) => {
@@ -230,17 +230,17 @@ const confirm = async (formDOM:FormInstance) => {
     let blob = await toBuffer(file.value) ;
     const h = await hash(blob);
     formdata.append('hash',h as string);
-    formdata.append('book_id',(state.formData as Book).book_id.toString());
-    formdata.append('book_name',(state.formData as Book).book_name);
-    formdata.append('book_press',(state.formData as Book).book_press);
-    formdata.append('book_class',(state.formData as Book).book_class);
+    formdata.append('book_id',(state.formData as BookData).book_id.toString());
+    formdata.append('book_name',(state.formData as BookData).book_name);
+    formdata.append('book_press',(state.formData as BookData).book_press);
+    formdata.append('book_class',(state.formData as BookData).book_class);
     formdata.append('book_imgUrl',blob);
-    formdata.append('book_inventory',(state.formData as Book).book_inventory.toString());
-    formdata.append('book_cost',(state.formData as Book).book_cost.toString());
+    formdata.append('book_inventory',(state.formData as BookData).book_inventory.toString());
+    formdata.append('book_cost',(state.formData as BookData).book_cost.toString());
     if(isAdd.value){        
         myAxios({
             method:'POST',
-            url:'/webapi/addBook',
+            url:'/webapi/addBookData',
             data:formdata,
             headers:{
                 'Content-Type':'multipart/form-data'
@@ -255,7 +255,7 @@ const confirm = async (formDOM:FormInstance) => {
     }else{        
         myAxios({
             method:'POST',
-            url:'/webapi/updateBook',
+            url:'/webapi/updateBookData',
             data:formdata,
             headers:{
                 'Content-Type':'multipart/form-data'
@@ -274,10 +274,10 @@ const confirm = async (formDOM:FormInstance) => {
   })
 }
 
-const look = (book:Book) => {
+const look = (book:BookData) => {
     imgDialog.value = !imgDialog.value;
     state.formData = book ;
-    src.value = 'http://127.0.0.1:3002/img?i='+(state.formData as Book).book_imgUrl;
+    src.value = 'http://127.0.0.1:3002/img?i='+(state.formData as BookData).book_imgUrl;
 }
 </script>
 
